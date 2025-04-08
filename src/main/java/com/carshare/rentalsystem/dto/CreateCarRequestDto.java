@@ -13,7 +13,7 @@ public record CreateCarRequestDto(
         @NotBlank
         String brand,
 
-        @NotBlank
+        @NotNull
         Car.Type type,
 
         @Positive
