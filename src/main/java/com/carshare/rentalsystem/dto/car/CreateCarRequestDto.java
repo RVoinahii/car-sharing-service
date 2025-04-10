@@ -1,4 +1,4 @@
-package com.carshare.rentalsystem.dto;
+package com.carshare.rentalsystem.dto.car;
 
 import com.carshare.rentalsystem.model.Car;
 import jakarta.validation.constraints.NotBlank;

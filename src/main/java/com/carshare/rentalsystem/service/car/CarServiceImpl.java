@@ -1,13 +1,13 @@
-package com.carshare.rentalsystem.service;
+package com.carshare.rentalsystem.service.car;
 
-import com.carshare.rentalsystem.dto.CarDto;
-import com.carshare.rentalsystem.dto.CarPreviewDto;
-import com.carshare.rentalsystem.dto.CreateCarRequestDto;
-import com.carshare.rentalsystem.dto.InventoryUpdateDto;
+import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
+import com.carshare.rentalsystem.dto.car.CarResponseDto;
+import com.carshare.rentalsystem.dto.car.CreateCarRequestDto;
+import com.carshare.rentalsystem.dto.car.InventoryUpdateRequestDto;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.mapper.CarMapper;
 import com.carshare.rentalsystem.model.Car;
-import com.carshare.rentalsystem.repository.CarRepository;
+import com.carshare.rentalsystem.repository.car.CarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,32 +22,33 @@ public class CarServiceImpl implements CarService {
     private final CarMapper carMapper;
 
     @Override
-    public Page<CarPreviewDto> getAll(Pageable pageable) {
+    public Page<CarPreviewResponseDto> getAll(Pageable pageable) {
         return carRepository.findAll(pageable)
                 .map(carMapper::toCarPreviewDto);
     }
 
     @Override
-    public CarDto getById(Long carId) {
+    public CarResponseDto getById(Long carId) {
         Car carById = getCarById(carId);
         return carMapper.toDto(carById);
     }
 
     @Override
-    public CarDto create(CreateCarRequestDto carDto) {
+    public CarResponseDto create(CreateCarRequestDto carDto) {
         Car car = carMapper.toEntity(carDto);
         return carMapper.toDto(carRepository.save(car));
     }
 
     @Override
-    public CarDto updateCarById(Long carId, CreateCarRequestDto updatedCarDataDto) {
+    public CarResponseDto updateCarById(Long carId, CreateCarRequestDto updatedCarDataDto) {
         Car existingCar = getCarById(carId);
         carMapper.updateCarFromDto(updatedCarDataDto, existingCar);
         return carMapper.toDto(carRepository.save(existingCar));
     }
 
     @Override
-    public CarDto updateInventoryByCarId(Long carId, InventoryUpdateDto inventoryDto) {
+    public CarResponseDto updateInventoryByCarId(Long carId,
+            InventoryUpdateRequestDto inventoryDto) {
         Car existingCar = getCarById(carId);
         existingCar.setInventory(inventoryDto.inventory());
         return carMapper.toDto(carRepository.save(existingCar));
