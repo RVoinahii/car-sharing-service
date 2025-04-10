@@ -1,8 +1,8 @@
-package com.carshare.rentalsystem.dto;
+package com.carshare.rentalsystem.dto.car;
 
 import jakarta.validation.constraints.Min;
 
-public record InventoryUpdateDto(
+public record InventoryUpdateRequestDto(
         @Min(0)
         int inventory
 ) {

@@ -1,4 +1,4 @@
-package com.carshare.rentalsystem.repository;
+package com.carshare.rentalsystem.repository.car;
 
 import com.carshare.rentalsystem.model.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
