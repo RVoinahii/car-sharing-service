@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = AtLeastOneFieldNotEmptyValidator.class)
-public @interface AtLeastOneFieldNotEmpty {
-    String message() default "At least one field must be provided";
+@Constraint(validatedBy = ReturnAfterRentalValidator.class)
+public @interface ReturnAfterRentalDate {
+    String message() default "Return date must be after rental date";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
