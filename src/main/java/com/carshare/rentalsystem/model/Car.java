@@ -50,4 +50,11 @@ public class Car {
         HATCHBACK,
         UNIVERSAL
     }
+
+    public Car() {
+    }
+
+    public Car(Long id) {
+        this.id = id;
+    }
 }
