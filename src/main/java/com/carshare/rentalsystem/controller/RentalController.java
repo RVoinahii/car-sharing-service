@@ -1,7 +1,6 @@
 package com.carshare.rentalsystem.controller;
 
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
-import com.carshare.rentalsystem.dto.rental.RentalDetailsResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import com.carshare.rentalsystem.model.User;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rentals")
 public class RentalController {
-    private static final String AUTHORITY_MANAGER = "MANAGER";
+    public static final String AUTHORITY_MANAGER = "MANAGER";
 
     private final RentalService rentalService;
 
@@ -38,7 +37,7 @@ public class RentalController {
                     + " their own rentals. Managers can view all rentals and filter them using"
                     + " parameters such as activity status. (Required roles: CUSTOMER, MANAGER)"
     )
-    public Page<RentalDetailsResponseDto> getAllRentals(Authentication authentication,
+    public Page<RentalResponseDto> getAllRentals(Authentication authentication,
             RentalSearchParameters searchParameters, Pageable pageable) {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
@@ -58,8 +57,8 @@ public class RentalController {
                     + "Customers can only access their own rentals, while managers can access"
                     + " any rental. (Required roles: CUSTOMER, MANAGER)"
     )
-    public RentalDetailsResponseDto getRentalDetails(Authentication authentication,
-            @PathVariable Long rentId) {
+    public RentalResponseDto getRentalDetails(Authentication authentication,
+                                              @PathVariable Long rentId) {
         return rentalService.getRentalInfo(getAuthenticatedUserId(authentication), rentId);
     }
 
@@ -72,7 +71,7 @@ public class RentalController {
                     + " (Required roles: CUSTOMER, MANAGER)"
     )
     public RentalResponseDto rentCar(Authentication authentication,
-            @RequestBody @Valid CreateRentalRequestDto requestDto) {
+                                            @RequestBody @Valid CreateRentalRequestDto requestDto) {
         return rentalService.create(getAuthenticatedUserId(authentication), requestDto);
     }
 
@@ -84,8 +83,8 @@ public class RentalController {
                     + " current date. Also increases the inventory count of the returned car."
                     + "(Required roles: CUSTOMER, MANAGER)"
     )
-    public RentalDetailsResponseDto returnRental(Authentication authentication,
-            @PathVariable Long rentId) {
+    public RentalResponseDto returnRental(Authentication authentication,
+                                          @PathVariable Long rentId) {
         return rentalService.returnRental(getAuthenticatedUserId(authentication), rentId);
     }
 

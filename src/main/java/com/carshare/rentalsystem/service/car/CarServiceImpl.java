@@ -24,7 +24,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public Page<CarPreviewResponseDto> getAll(Pageable pageable) {
         return carRepository.findAll(pageable)
-                .map(carMapper::toCarPreviewDto);
+                .map(carMapper::toPreviewDto);
     }
 
     @Override

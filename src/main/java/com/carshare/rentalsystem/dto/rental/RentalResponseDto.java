@@ -1,5 +1,6 @@
 package com.carshare.rentalsystem.dto.rental;
 
+import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import lombok.Getter;
@@ -16,6 +17,9 @@ public class RentalResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate returnDate;
 
-    private Long carId;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate actualReturnDate;
+
+    private CarPreviewResponseDto car;
     private Long userId;
 }
