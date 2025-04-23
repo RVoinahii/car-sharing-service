@@ -25,6 +25,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
     public static final String[] PUBLIC_URLS = {
             "/auth/**",
+            "/payments/success",
+            "/payment/cancel",
             "/error"
     };
 

@@ -18,7 +18,8 @@ public interface CarMapper {
 
     Car toEntity(CreateCarRequestDto requestDto);
 
-    CarPreviewResponseDto toCarPreviewDto(Car car);
+    @Named("toPreviewDto")
+    CarPreviewResponseDto toPreviewDto(Car car);
 
     void updateCarFromDto(CreateCarRequestDto updatedCar, @MappingTarget Car existingCar);
 

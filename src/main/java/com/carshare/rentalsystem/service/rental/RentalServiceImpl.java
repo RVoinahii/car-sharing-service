@@ -1,7 +1,6 @@
 package com.carshare.rentalsystem.service.rental;
 
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
-import com.carshare.rentalsystem.dto.rental.RentalDetailsResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import com.carshare.rentalsystem.exception.AccessDeniedException;
@@ -58,22 +57,22 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public Page<RentalDetailsResponseDto> getRentalsById(Long userId, Pageable pageable) {
+    public Page<RentalResponseDto> getRentalsById(Long userId, Pageable pageable) {
         return rentalRepository.findAllByUserId(userId, pageable)
-                .map(rentalMapper::toDetailsDto);
+                .map(rentalMapper::toDto);
     }
 
     @Override
-    public Page<RentalDetailsResponseDto> getSpecificRentals(
+    public Page<RentalResponseDto> getSpecificRentals(
             RentalSearchParameters searchParameters, Pageable pageable) {
         Specification<Rental> rentalSpecification =
                 rentalSpecificationBuilder.build(searchParameters);
         return rentalRepository.findAll(rentalSpecification, pageable)
-                .map(rentalMapper::toDetailsDto);
+                .map(rentalMapper::toDto);
     }
 
     @Override
-    public RentalDetailsResponseDto getRentalInfo(Long userId, Long rentalId) {
+    public RentalResponseDto getRentalInfo(Long userId, Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find rental with id: " + rentalId)
         );
@@ -81,11 +80,11 @@ public class RentalServiceImpl implements RentalService {
         if (!rental.getUser().getId().equals(userId)) {
             throw new EntityNotFoundException("Can't find rental with id: " + rentalId);
         }
-        return rentalMapper.toDetailsDto(rental);
+        return rentalMapper.toDto(rental);
     }
 
     @Override
-    public RentalDetailsResponseDto returnRental(Long userId, Long rentalId) {
+    public RentalResponseDto returnRental(Long userId, Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find rental with id: " + rentalId)
         );
@@ -107,6 +106,6 @@ public class RentalServiceImpl implements RentalService {
         car.setInventory(car.getInventory() + 1);
         carRepository.save(car);
 
-        return rentalMapper.toDetailsDto(rental);
+        return rentalMapper.toDto(rental);
     }
 }
