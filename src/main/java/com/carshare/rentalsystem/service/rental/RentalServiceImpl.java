@@ -6,6 +6,7 @@ import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import com.carshare.rentalsystem.exception.AccessDeniedException;
 import com.carshare.rentalsystem.exception.CarNotAvailableException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
+import com.carshare.rentalsystem.exception.RentalAlreadyReturnedException;
 import com.carshare.rentalsystem.mapper.RentalMapper;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
@@ -26,6 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class RentalServiceImpl implements RentalService {
+    private static final int MIN_INVENTORY_TO_RENT = 1;
+    private static final int CAR_INVENTORY_DECREMENT = 1;
+    private static final int CAR_INVENTORY_INCREMENT = 1;
+
     private final CarRepository carRepository;
     private final RentalMapper rentalMapper;
     private final UserRepository userRepository;
@@ -39,12 +44,12 @@ public class RentalServiceImpl implements RentalService {
                         + requestDto.getCarId())
         );
 
-        if (car.getInventory() < 1) {
+        if (car.getInventory() < MIN_INVENTORY_TO_RENT) {
             throw new CarNotAvailableException("Car with id: "
                     + requestDto.getCarId() + " is out of stock");
         }
 
-        car.setInventory(car.getInventory() - 1);
+        car.setInventory(car.getInventory() - CAR_INVENTORY_DECREMENT);
         carRepository.save(car);
 
         Rental rental = rentalMapper.toEntity(requestDto);
@@ -90,11 +95,11 @@ public class RentalServiceImpl implements RentalService {
         );
 
         if (rental.getActualReturnDate() != null) {
-            throw new IllegalStateException("This rental has already been returned");
+            throw new RentalAlreadyReturnedException("This rental has already been returned");
         }
 
         if (!rental.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("You are now allowed to return this rental");
+            throw new AccessDeniedException("You are not allowed to return this rental");
         }
 
         rental.setActualReturnDate(LocalDate.now());
@@ -103,7 +108,7 @@ public class RentalServiceImpl implements RentalService {
                 () -> new EntityNotFoundException("Can't find car with id: "
                         + rental.getCar().getId())
         );
-        car.setInventory(car.getInventory() + 1);
+        car.setInventory(car.getInventory() + CAR_INVENTORY_INCREMENT);
         carRepository.save(car);
 
         return rentalMapper.toDto(rental);
