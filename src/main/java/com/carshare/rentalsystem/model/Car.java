@@ -41,7 +41,7 @@ public class Car {
     @Column(nullable = false)
     private BigDecimal dailyFee;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TINYINT")
     private boolean isDeleted = false;
 
     public enum Type {

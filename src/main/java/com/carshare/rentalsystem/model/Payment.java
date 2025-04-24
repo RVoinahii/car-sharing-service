@@ -25,23 +25,30 @@ public class Payment {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentType type;
 
     @ManyToOne
     @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;
 
+    @Column(nullable = false)
     private String sessionId;
 
-    @Column(length = 1000)
+    @Column(length = 1000, nullable = false)
     private String sessionUrl;
 
+    @Column(nullable = false)
     private BigDecimal amountToPay;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
     private LocalDateTime expiredAt;
 
     public enum PaymentStatus {

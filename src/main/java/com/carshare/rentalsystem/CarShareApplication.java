@@ -1,17 +1,13 @@
 package com.carshare.rentalsystem;
 
-import com.carshare.rentalsystem.model.Role;
-import com.carshare.rentalsystem.repository.role.RoleRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
@@ -41,23 +37,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         bearerFormat = "JWT"
 )
 public class CarShareApplication {
-    private final RoleRepository roleRepository;
-
     public static void main(String[] args) {
         SpringApplication.run(CarShareApplication.class, args);
-    }
-
-    @Bean
-    public CommandLineRunner commandLineRunner() {
-        return args -> {
-            Role roleManager = new Role();
-            roleManager.setRole(Role.RoleName.MANAGER);
-
-            Role roleCustomer = new Role();
-            roleCustomer.setRole(Role.RoleName.CUSTOMER);
-
-            roleRepository.save(roleManager);
-            roleRepository.save(roleCustomer);
-        };
     }
 }
