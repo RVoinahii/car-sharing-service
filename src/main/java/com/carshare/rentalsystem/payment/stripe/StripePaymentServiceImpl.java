@@ -3,7 +3,11 @@ package com.carshare.rentalsystem.payment.stripe;
 import com.carshare.rentalsystem.dto.payment.CreatePaymentRequestDto;
 import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
+import com.carshare.rentalsystem.exception.ActiveRentalAlreadyExistsException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
+import com.carshare.rentalsystem.exception.InvalidPaymentTypeException;
+import com.carshare.rentalsystem.exception.PaymentNotExpiredException;
+import com.carshare.rentalsystem.exception.RentalNotFinishedException;
 import com.carshare.rentalsystem.mapper.PaymentMapper;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Payment.PaymentType;
@@ -51,7 +55,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     public PaymentPreviewResponseDto createStripeSession(CreatePaymentRequestDto requestDto,
                                                          Long userId) {
         if (!canBorrowCars(userId)) {
-            throw new IllegalStateException("User already have rent!");
+            throw new ActiveRentalAlreadyExistsException("User already has an active rent!");
         }
 
         Rental rental = rentalRepository.findByIdAndUserId(requestDto.rentalId(), userId)
@@ -62,7 +66,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         LocalDate actualReturn = rental.getActualReturnDate();
 
         if (actualReturn == null) {
-            throw new IllegalStateException("Can't create session for open rental.");
+            throw new RentalNotFinishedException("Can't create session for an open rental.");
         }
 
         boolean isOverdue = actualReturn.isAfter(plannedReturn);
@@ -85,7 +89,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         );
 
         if (payment.getStatus() != Payment.PaymentStatus.EXPIRED) {
-            throw new IllegalStateException("Only expired payments can be renewed.");
+            throw new PaymentNotExpiredException("Only expired payments can be renewed.");
         }
 
         Rental rental = payment.getRental();
@@ -127,12 +131,12 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     private void validatePaymentType(PaymentType type, boolean isOverdue) {
         if (type == PaymentType.FINE && !isOverdue) {
-            throw new IllegalStateException("Cannot create FINE payment if rental "
+            throw new InvalidPaymentTypeException("Cannot create FINE payment if rental "
                     + "is not overdue. Use PAYMENT instead.");
         }
 
         if (type == PaymentType.PAYMENT && isOverdue) {
-            throw new IllegalStateException("Cannot create PAYMENT if rental is "
+            throw new InvalidPaymentTypeException("Cannot create PAYMENT if rental is "
                     + "overdue. Use FINE instead.");
         }
     }
