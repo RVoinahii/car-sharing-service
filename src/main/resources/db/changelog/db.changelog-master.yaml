@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/05-create-payments-table.yaml
   - include:
       file: db/changelog/changes/06-insert-roles-into-roles-table.yaml
+  - include:
+      file: db/changelog/changes/07-create-telegram-user-links-table.yaml

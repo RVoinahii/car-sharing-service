@@ -3,6 +3,7 @@ package com.carshare.rentalsystem.controller;
 import static com.carshare.rentalsystem.controller.RentalController.AUTHORITY_MANAGER;
 
 import com.carshare.rentalsystem.dto.payment.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
 import com.carshare.rentalsystem.model.User;
@@ -65,8 +66,8 @@ public class PaymentController {
             description = "Returns information about a cancelled payment. Stripe redirects here"
                     + "  when the user cancels the session. (Required roles: CUSTOMER, MANAGER)"
     )
-    public String paymentCancel() {
-        return paymentService.handleCancel();
+    public PaymentCancelResponseDto paymentCancel(@RequestParam("session_id") String sessionId) {
+        return paymentService.handleCancel(sessionId);
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")

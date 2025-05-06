@@ -8,15 +8,13 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PaymentPreviewResponseDto {
+public class PaymentCancelResponseDto {
     private Long id;
     private String sessionId;
     private String sessionUrl;
     private BigDecimal amountToPay;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expiredAt;
+    private String cancelMessage;
 }

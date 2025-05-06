@@ -39,10 +39,10 @@ public class RentalController {
     )
     public Page<RentalResponseDto> getAllRentals(Authentication authentication,
             RentalSearchParameters searchParameters, Pageable pageable) {
-        boolean isAdmin = authentication.getAuthorities().stream()
+        boolean isManager = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
 
-        if (isAdmin) {
+        if (isManager) {
             return rentalService.getSpecificRentals(searchParameters, pageable);
         }
 
@@ -58,8 +58,16 @@ public class RentalController {
                     + " any rental. (Required roles: CUSTOMER, MANAGER)"
     )
     public RentalResponseDto getRentalDetails(Authentication authentication,
-                                              @PathVariable Long rentId) {
-        return rentalService.getRentalInfo(getAuthenticatedUserId(authentication), rentId);
+                                              @PathVariable Long rentalId) {
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
+
+        if (isManager) {
+            return rentalService.getAnyRentalInfo(rentalId);
+        }
+
+        return rentalService.getCustomerRentalInfo(
+                getAuthenticatedUserId(authentication), rentalId);
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
@@ -71,7 +79,7 @@ public class RentalController {
                     + " (Required roles: CUSTOMER, MANAGER)"
     )
     public RentalResponseDto rentCar(Authentication authentication,
-                                            @RequestBody @Valid CreateRentalRequestDto requestDto) {
+                                     @RequestBody @Valid CreateRentalRequestDto requestDto) {
         return rentalService.create(getAuthenticatedUserId(authentication), requestDto);
     }
 

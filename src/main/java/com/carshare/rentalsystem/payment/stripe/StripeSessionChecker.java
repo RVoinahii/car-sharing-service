@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class StripeSessionChecker {
     private final PaymentRepository paymentRepository;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 3_600_000)
     public void checkExpiredSessions() {
         List<Payment> payments = paymentRepository.findByStatus(PaymentStatus.PENDING);
 

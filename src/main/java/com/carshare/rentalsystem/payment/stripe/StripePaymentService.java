@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.payment.stripe;
 
 import com.carshare.rentalsystem.dto.payment.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
 import org.springframework.data.domain.Page;
@@ -16,5 +17,5 @@ public interface StripePaymentService {
 
     PaymentResponseDto handleSuccess(String sessionId);
 
-    String handleCancel();
+    PaymentCancelResponseDto handleCancel(String sessionId);
 }
