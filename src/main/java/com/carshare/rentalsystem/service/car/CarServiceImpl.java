@@ -14,31 +14,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final CarMapper carMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public Page<CarPreviewResponseDto> getAll(Pageable pageable) {
         return carRepository.findAll(pageable)
                 .map(carMapper::toPreviewDto);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public CarResponseDto getById(Long carId) {
         Car carById = getCarById(carId);
         return carMapper.toDto(carById);
     }
 
+    @Transactional
     @Override
     public CarResponseDto create(CreateCarRequestDto carDto) {
         Car car = carMapper.toEntity(carDto);
         return carMapper.toDto(carRepository.save(car));
     }
 
+    @Transactional
     @Override
     public CarResponseDto updateCarById(Long carId, CreateCarRequestDto updatedCarDataDto) {
         Car existingCar = getCarById(carId);
@@ -46,6 +49,7 @@ public class CarServiceImpl implements CarService {
         return carMapper.toDto(carRepository.save(existingCar));
     }
 
+    @Transactional
     @Override
     public CarResponseDto updateInventoryByCarId(Long carId,
             InventoryUpdateRequestDto inventoryDto) {
@@ -54,6 +58,7 @@ public class CarServiceImpl implements CarService {
         return carMapper.toDto(carRepository.save(existingCar));
     }
 
+    @Transactional
     @Override
     public void deleteById(Long carId) {
         carRepository.deleteById(carId);

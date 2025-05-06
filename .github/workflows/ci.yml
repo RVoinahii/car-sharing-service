@@ -20,6 +20,7 @@ jobs:
       - name: Set Stripe keys from GitHub Secrets
         run: |
           echo "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify

@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
+    @Transactional
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto) {
         if (userRepository.existsByEmail(requestDto.getEmail())) {
@@ -36,11 +37,13 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponseDto getUserInfo(Long userId) {
         return userMapper.toDto(findUserById(userId));
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUserInfo(Long userId, UserUpdateRequestDto requestDto) {
         User existingUser = findUserById(userId);
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(userRepository.save(existingUser));
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUserRole(Long userId, UpdateUserRoleRequestDto requestDto) {
         User existingUser = findUserById(userId);

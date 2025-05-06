@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.mapper;
 
 import com.carshare.rentalsystem.config.MapperConfig;
+import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
 import com.carshare.rentalsystem.model.Payment;
@@ -14,6 +15,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface PaymentMapper {
     @Mapping(target = "rental", source = "rental", qualifiedByName = "toDto")
     PaymentResponseDto toDto(Payment payment);
+
+    PaymentCancelResponseDto toCancelDto(Payment payment);
 
     PaymentPreviewResponseDto toPreviewDto(Payment payment);
 }
