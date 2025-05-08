@@ -3,7 +3,7 @@ package com.carshare.rentalsystem.notifications;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Rental;
 
-public interface NotificationGeneratorService {
+public interface NotificationSender {
 
     void notifyManagersAboutNewRental(Rental rental);
 
