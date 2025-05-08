@@ -1,10 +1,10 @@
-package com.carshare.rentalsystem.notifications.telegram.notification.templates;
+package com.carshare.rentalsystem.notifications.telegram.notification.sender.templates;
 
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.notifications.telegram.NotificationType;
+import com.carshare.rentalsystem.notifications.NotificationType;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

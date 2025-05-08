@@ -11,7 +11,7 @@ import com.carshare.rentalsystem.mapper.RentalMapper;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.notifications.NotificationGeneratorService;
+import com.carshare.rentalsystem.notifications.NotificationSender;
 import com.carshare.rentalsystem.repository.car.CarRepository;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
 import com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder;
@@ -36,7 +36,7 @@ public class RentalServiceImpl implements RentalService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
     private final RentalSpecificationBuilder rentalSpecificationBuilder;
-    private final NotificationGeneratorService notificationGeneratorService;
+    private final NotificationSender notificationBuilder;
 
     @Transactional
     @Override
@@ -61,8 +61,8 @@ public class RentalServiceImpl implements RentalService {
         rental.setCar(car);
         RentalResponseDto rentalResponseDto = rentalMapper.toDto(rentalRepository.save(rental));
 
-        notificationGeneratorService.notifyManagersAboutNewRental(rental);
-        notificationGeneratorService.notifyCustomerAboutNewRental(rental, userId);
+        notificationBuilder.notifyManagersAboutNewRental(rental);
+        notificationBuilder.notifyCustomerAboutNewRental(rental, userId);
 
         return rentalResponseDto;
     }
@@ -124,8 +124,8 @@ public class RentalServiceImpl implements RentalService {
         car.setInventory(car.getInventory() + CAR_INVENTORY_INCREMENT);
         carRepository.save(car);
 
-        notificationGeneratorService.notifyManagersAboutRentalReturn(rental);
-        notificationGeneratorService.notifyCustomerAboutRentalReturn(rental, userId);
+        notificationBuilder.notifyManagersAboutRentalReturn(rental);
+        notificationBuilder.notifyCustomerAboutRentalReturn(rental, userId);
 
         return rentalMapper.toDto(rental);
     }

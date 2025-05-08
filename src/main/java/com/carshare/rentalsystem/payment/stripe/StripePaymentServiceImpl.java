@@ -14,7 +14,7 @@ import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Payment.PaymentType;
 import com.carshare.rentalsystem.model.PaymentSession;
 import com.carshare.rentalsystem.model.Rental;
-import com.carshare.rentalsystem.notifications.NotificationGeneratorService;
+import com.carshare.rentalsystem.notifications.NotificationSender;
 import com.carshare.rentalsystem.payment.PaymentProvider;
 import com.carshare.rentalsystem.repository.payment.PaymentRepository;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
@@ -45,7 +45,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentProvider paymentProvider;
     private final PaymentMapper paymentMapper;
-    private final NotificationGeneratorService notificationGeneratorService;
+    private final NotificationSender notificationBuilder;
 
     @Transactional(readOnly = true)
     @Override
@@ -113,8 +113,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         payment.setCreatedAt(LocalDateTime.now());
         payment.setExpiredAt(LocalDateTime.now().plusHours(PAYMENT_SESSION_EXPIRATION_HOURS));
 
-        notificationGeneratorService.notifyManagersAboutRenewPayment(payment);
-        notificationGeneratorService.notifyCustomerAboutRenewPayment(payment, userId);
+        notificationBuilder.notifyManagersAboutRenewPayment(payment);
+        notificationBuilder.notifyCustomerAboutRenewPayment(payment, userId);
 
         return paymentMapper.toPreviewDto(paymentRepository.save(payment));
     }
@@ -130,8 +130,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         PaymentResponseDto responseDto = paymentMapper.toDto(savedPayment);
 
-        notificationGeneratorService.notifyManagersAboutSuccessfulPayment(payment);
-        notificationGeneratorService.notifyCustomerAboutSuccessfulPayment(
+        notificationBuilder.notifyManagersAboutSuccessfulPayment(payment);
+        notificationBuilder.notifyCustomerAboutSuccessfulPayment(
                 payment, payment.getRental().getUser().getId());
 
         return responseDto;
@@ -146,8 +146,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         PaymentCancelResponseDto responseDto = paymentMapper.toCancelDto(payment);
         responseDto.setCancelMessage(CANCEL_PAYMENT_MESSAGE);
 
-        notificationGeneratorService.notifyManagersAboutPaymentCancel(payment);
-        notificationGeneratorService.notifyCustomerAboutPaymentCancel(
+        notificationBuilder.notifyManagersAboutPaymentCancel(payment);
+        notificationBuilder.notifyCustomerAboutPaymentCancel(
                 payment, payment.getRental().getUser().getId());
 
         return responseDto;
