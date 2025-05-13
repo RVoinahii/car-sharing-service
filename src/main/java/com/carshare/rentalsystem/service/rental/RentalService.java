@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.service.rental;
 
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,9 @@ public interface RentalService {
 
     Page<RentalResponseDto> getSpecificRentals(RentalSearchParameters params,
                                                Pageable pageable);
+
+    Page<RentalPreviewResponseDto> getAllRentalsPreview(boolean isManager, Long userId,
+                                                        Pageable pageable);
 
     RentalResponseDto getAnyRentalInfo(Long rentalId);
 
