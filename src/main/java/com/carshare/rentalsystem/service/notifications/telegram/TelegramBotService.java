@@ -4,9 +4,11 @@ import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.repository.telegram.user.link.TelegramUserLinkRepository;
 import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandDispatcher;
 import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandHandler;
+import com.carshare.rentalsystem.service.notifications.telegram.command.handler.rental.command.callback.handler.AllRentalsCallbackHandler;
 import com.carshare.rentalsystem.service.notifications.telegram.templates.NotificationRecipient;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TelegramBotService {
     public static final String MANAGER_ROLE = "MANAGER";
+    public static final String CUSTOMER_ROLE = "CUSTOMER";
 
     private static final String COMMAND_PREFIX = "/";
     private static final String SPACE_DELIMITER = " ";
@@ -34,6 +37,7 @@ public class TelegramBotService {
     private final TelegramUserLinkRepository telegramUserLinkRepository;
     private final TelegramCommandDispatcher telegramCommandDispatcher;
     private final ActiveTelegramUserStorage activeUserLinks;
+    private final AllRentalsCallbackHandler allRentalsCallbackHandler;
 
     @PostConstruct
     public void init() {
@@ -45,6 +49,9 @@ public class TelegramBotService {
             for (Update update : updates) {
                 if (update.message() != null) {
                     handleMessage(update.message());
+                } else if (update.callbackQuery() != null) {
+                    CallbackQuery callbackQuery = update.callbackQuery();
+                    allRentalsCallbackHandler.handleCallback(this.bot, callbackQuery);
                 }
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;

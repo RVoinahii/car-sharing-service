@@ -1,6 +1,9 @@
 package com.carshare.rentalsystem.service.notifications.telegram.templates;
 
+import static com.carshare.rentalsystem.service.notifications.telegram.command.handler.rental.command.GetAllRentalsCommandHandler.PAGE_INDEX_OFFSET;
+
 import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
+import com.carshare.rentalsystem.dto.rental.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
@@ -9,6 +12,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -194,6 +198,31 @@ public class RentalNotificationTemplates {
                     rentalStatus
             );
         }
+    }
+
+    public String createRentalListPageMessage(boolean isCustomer,
+                                              Page<RentalPreviewResponseDto> page) {
+        StringBuilder builder = new StringBuilder();
+        int currentPage = page.getNumber() + PAGE_INDEX_OFFSET;
+        int totalPages = page.getTotalPages();
+
+        builder.append(String.format("📋 Rentals — page %d of %d:\n\n", currentPage, totalPages));
+
+        for (RentalPreviewResponseDto rental : page.getContent()) {
+            builder.append("🔹 Rental ID: ")
+                    .append(rental.getId())
+                    .append(" — ")
+                    .append(rental.isActive() ? "▶ Active" : "✅ Completed");
+
+            if (!isCustomer) {
+                builder.append(" — 👤 User ID: ").append(rental.getUserId());
+            }
+
+            builder.append("\n");
+        }
+
+        builder.append("\n📎 To view details: /get_rental <rental_id>");
+        return builder.toString();
     }
 
     private String formatUserInfo(User user) {

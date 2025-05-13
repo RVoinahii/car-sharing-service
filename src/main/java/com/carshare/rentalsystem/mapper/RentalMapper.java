@@ -2,6 +2,7 @@ package com.carshare.rentalsystem.mapper;
 
 import com.carshare.rentalsystem.config.MapperConfig;
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.model.Rental;
 import org.mapstruct.Mapper;
@@ -20,4 +21,13 @@ public interface RentalMapper {
 
     @Mapping(target = "car", source = "carId", qualifiedByName = "carById")
     Rental toEntity(CreateRentalRequestDto requestDto);
+
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "active", source = "rental", qualifiedByName = "isRentalActive")
+    RentalPreviewResponseDto toPreviewDto(Rental rental);
+
+    @Named("isRentalActive")
+    default boolean isRentalActive(Rental rental) {
+        return rental.getActualReturnDate() == null;
+    }
 }

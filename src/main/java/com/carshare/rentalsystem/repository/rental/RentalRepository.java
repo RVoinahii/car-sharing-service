@@ -17,6 +17,13 @@ public interface RentalRepository extends JpaRepository<Rental, Long>,
             + " WHERE r.user.id = :userId")
     Page<Rental> findAllByUserIdWithCarAndUser(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT r FROM Rental r JOIN FETCH r.user"
+            + " WHERE r.user.id = :userId")
+    Page<Rental> findAllByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT r FROM Rental r JOIN FETCH r.user")
+    Page<Rental> findAllWithUser(Pageable pageable);
+
     @Query("SELECT r FROM Rental r JOIN FETCH r.car c JOIN FETCH r.user u WHERE r.id = :rentalId")
     Optional<Rental> findByIdWithCarAndUser(@Param("rentalId") Long rentalId);
 

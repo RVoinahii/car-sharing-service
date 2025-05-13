@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.service.rental;
 
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import com.carshare.rentalsystem.dto.rental.event.dto.RentalCreatedEventDto;
@@ -86,6 +87,17 @@ public class RentalServiceImpl implements RentalService {
 
         return rentalRepository.findAll(rentalSpecification, pageable)
                 .map(rentalMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<RentalPreviewResponseDto> getAllRentalsPreview(boolean isManager,
+                                                               Long userId, Pageable pageable) {
+        Page<Rental> rentals = isManager
+                ? rentalRepository.findAllWithUser(pageable)
+                : rentalRepository.findAllByUserIdWithUser(userId, pageable);
+
+        return rentals.map(rentalMapper::toPreviewDto);
     }
 
     @Override
