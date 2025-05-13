@@ -2,7 +2,7 @@ package com.carshare.rentalsystem.controller;
 
 import com.carshare.rentalsystem.dto.telegram.TelegramTokenResponseDto;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.notifications.telegram.TelegramAuthenticationService;
+import com.carshare.rentalsystem.service.notifications.telegram.TelegramAuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;

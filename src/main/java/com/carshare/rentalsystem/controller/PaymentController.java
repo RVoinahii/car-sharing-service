@@ -7,7 +7,7 @@ import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.payment.stripe.StripePaymentService;
+import com.carshare.rentalsystem.service.payment.stripe.StripePaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
