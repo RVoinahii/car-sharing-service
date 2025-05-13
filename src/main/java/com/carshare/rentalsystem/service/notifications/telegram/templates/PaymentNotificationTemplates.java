@@ -4,7 +4,6 @@ import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
-
 import java.time.LocalDateTime;
 import java.util.EnumMap;
 import lombok.RequiredArgsConstructor;

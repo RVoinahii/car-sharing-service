@@ -5,7 +5,6 @@ import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
