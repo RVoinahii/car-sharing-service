@@ -3,6 +3,8 @@ package com.carshare.rentalsystem.service.rental;
 import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
+import com.carshare.rentalsystem.dto.rental.event.dto.RentalCreatedEventDto;
+import com.carshare.rentalsystem.dto.rental.event.dto.RentalReturnEventDto;
 import com.carshare.rentalsystem.exception.AccessDeniedException;
 import com.carshare.rentalsystem.exception.CarNotAvailableException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
@@ -11,13 +13,13 @@ import com.carshare.rentalsystem.mapper.RentalMapper;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.notifications.NotificationSender;
 import com.carshare.rentalsystem.repository.car.CarRepository;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
 import com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder;
 import com.carshare.rentalsystem.repository.user.UserRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,7 +38,7 @@ public class RentalServiceImpl implements RentalService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
     private final RentalSpecificationBuilder rentalSpecificationBuilder;
-    private final NotificationSender notificationBuilder;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     @Override
@@ -61,8 +63,9 @@ public class RentalServiceImpl implements RentalService {
         rental.setCar(car);
         RentalResponseDto rentalResponseDto = rentalMapper.toDto(rentalRepository.save(rental));
 
-        notificationBuilder.notifyManagersAboutNewRental(rental);
-        notificationBuilder.notifyCustomerAboutNewRental(rental, userId);
+        applicationEventPublisher.publishEvent(
+                new RentalCreatedEventDto(rental, rental.getUser().getId())
+        );
 
         return rentalResponseDto;
     }
@@ -124,8 +127,9 @@ public class RentalServiceImpl implements RentalService {
         car.setInventory(car.getInventory() + CAR_INVENTORY_INCREMENT);
         carRepository.save(car);
 
-        notificationBuilder.notifyManagersAboutRentalReturn(rental);
-        notificationBuilder.notifyCustomerAboutRentalReturn(rental, userId);
+        applicationEventPublisher.publishEvent(
+                new RentalReturnEventDto(rental, rental.getUser().getId())
+        );
 
         return rentalMapper.toDto(rental);
     }
