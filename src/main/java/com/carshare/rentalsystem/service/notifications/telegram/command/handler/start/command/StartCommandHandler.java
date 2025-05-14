@@ -1,10 +1,11 @@
-package com.carshare.rentalsystem.service.notifications.telegram.command.handler;
+package com.carshare.rentalsystem.service.notifications.telegram.command.handler.start.command;
 
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.repository.telegram.user.link.TelegramUserLinkRepository;
 import com.carshare.rentalsystem.service.notifications.telegram.ActiveTelegramUserStorage;
 import com.carshare.rentalsystem.service.notifications.telegram.TelegramAuthenticationService;
 import com.carshare.rentalsystem.service.notifications.telegram.TelegramLinkService;
+import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandHandler;
 import com.carshare.rentalsystem.service.notifications.telegram.templates.AuthenticationNotificationTemplates;
 import com.carshare.rentalsystem.util.AesEncryptionUtil;
 import com.pengrad.telegrambot.TelegramBot;

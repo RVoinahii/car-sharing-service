@@ -82,4 +82,12 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return !isDeleted;
     }
+
+    public boolean isManager() {
+        return this.role.getRole().name().equals(Role.RoleName.MANAGER.name());
+    }
+
+    public boolean isCustomer() {
+        return this.role.getRole().name().equals(Role.RoleName.CUSTOMER.name());
+    }
 }
