@@ -4,13 +4,15 @@ import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.repository.telegram.user.link.TelegramUserLinkRepository;
 import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandDispatcher;
 import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandHandler;
-import com.carshare.rentalsystem.service.notifications.telegram.command.handler.rental.command.callback.handler.AllRentalsCallbackHandler;
+import com.carshare.rentalsystem.service.notifications.telegram.command.handler.callback.handler.TelegramCallbackDispatcher;
+import com.carshare.rentalsystem.service.notifications.telegram.command.handler.callback.handler.TelegramCallbackHandler;
 import com.carshare.rentalsystem.service.notifications.telegram.templates.NotificationRecipient;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.PostConstruct;
 import java.util.EnumMap;
@@ -22,11 +24,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class TelegramBotService {
-    public static final String MANAGER_ROLE = "MANAGER";
-    public static final String CUSTOMER_ROLE = "CUSTOMER";
-
     private static final String COMMAND_PREFIX = "/";
     private static final String SPACE_DELIMITER = " ";
+    private static final String COLON_DELIMITER = ":";
     private static final int COMMAND_PART_INDEX = 0;
 
     @Value("${telegram.bot-token}")
@@ -36,8 +36,8 @@ public class TelegramBotService {
 
     private final TelegramUserLinkRepository telegramUserLinkRepository;
     private final TelegramCommandDispatcher telegramCommandDispatcher;
+    private final TelegramCallbackDispatcher telegramCallbackDispatcher;
     private final ActiveTelegramUserStorage activeUserLinks;
-    private final AllRentalsCallbackHandler allRentalsCallbackHandler;
 
     @PostConstruct
     public void init() {
@@ -50,8 +50,7 @@ public class TelegramBotService {
                 if (update.message() != null) {
                     handleMessage(update.message());
                 } else if (update.callbackQuery() != null) {
-                    CallbackQuery callbackQuery = update.callbackQuery();
-                    allRentalsCallbackHandler.handleCallback(this.bot, callbackQuery);
+                    handleCallback(update.callbackQuery());
                 }
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
@@ -60,7 +59,7 @@ public class TelegramBotService {
 
     public void notifyManagers(String messageText) {
         for (TelegramUserLink link : activeUserLinks.getAll()) {
-            if (MANAGER_ROLE.equals(link.getUser().getRole().getRole().name())) {
+            if (link.getUser().isManager()) {
                 try {
                     bot.execute(new SendMessage(link.getChatId(), messageText));
                 } catch (Exception e) {
@@ -94,7 +93,6 @@ public class TelegramBotService {
 
     private void handleMessage(Message message) {
         String text = message.text();
-        System.out.println(text);
 
         if (text != null && text.startsWith(COMMAND_PREFIX)) {
             String command = text.split(SPACE_DELIMITER)[COMMAND_PART_INDEX];
@@ -105,6 +103,27 @@ public class TelegramBotService {
                 commandHandler.handle(bot, message);
             } else {
                 bot.execute(new SendMessage(message.chat().id(), "❗️ Unknown command"));
+            }
+        }
+    }
+
+    private void handleCallback(CallbackQuery callbackQuery) {
+        String data = callbackQuery.data();
+        if (data != null) {
+            String handlerKey = data.substring(0, data.indexOf(COLON_DELIMITER) + 1);
+            TelegramCallbackHandler callbackHandler =
+                    telegramCallbackDispatcher.getCallbackHandler(handlerKey);
+            if (callbackHandler != null) {
+                callbackHandler.handle(bot, callbackQuery);
+            } else {
+                Message message = callbackQuery.message();
+                if (message == null) {
+                    bot.execute(new AnswerCallbackQuery(callbackQuery.id())
+                            .text("⚠️ Unable to process this action.")
+                            .showAlert(true));
+                    return;
+                }
+                bot.execute(new SendMessage(message.chat().id(), "❗️ Unknown callback"));
             }
         }
     }

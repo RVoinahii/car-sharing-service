@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto updateUserInfo(Long userId, UserUpdateRequestDto requestDto) {
         User existingUser = findUserById(userId);
-        System.out.println(existingUser);
         if (requestDto.email() != null) {
             if (userRepository.existsByEmail(requestDto.email())) {
                 throw new EmailAlreadyExistsException(
@@ -56,7 +55,6 @@ public class UserServiceImpl implements UserService {
 
         }
         userMapper.updateUserFromDto(requestDto, existingUser);
-        System.out.println(existingUser);
         return userMapper.toDto(userRepository.save(existingUser));
     }
 

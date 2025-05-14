@@ -1,10 +1,9 @@
 package com.carshare.rentalsystem.service.notifications.telegram.command.handler.rental.command;
 
-import static com.carshare.rentalsystem.service.notifications.telegram.TelegramBotService.MANAGER_ROLE;
-
 import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.model.TelegramUserLink;
+import com.carshare.rentalsystem.model.User;
 import com.carshare.rentalsystem.service.notifications.telegram.ActiveTelegramUserStorage;
 import com.carshare.rentalsystem.service.notifications.telegram.command.handler.TelegramCommandHandler;
 import com.carshare.rentalsystem.service.notifications.telegram.templates.RentalNotificationTemplates;
@@ -45,6 +44,8 @@ public class GetRentalCommandHandler implements TelegramCommandHandler {
             return;
         }
 
+        User user = telegramUserLink.getUser();
+
         String[] parts = text.trim().split(COMMAND_ARGUMENT_DELIMITER_REGEX);
         if (parts.length < MIN_COMMAND_PARTS) {
             bot.execute(new SendMessage(
@@ -56,10 +57,7 @@ public class GetRentalCommandHandler implements TelegramCommandHandler {
         try {
             Long rentalId = Long.parseLong(parts[RENTAL_ID_INDEX]);
 
-            boolean isManager = telegramUserLink.getUser().getRole()
-                    .getRole().name().equals(MANAGER_ROLE);
-
-            if (isManager) {
+            if (user.isManager()) {
                 RentalResponseDto responseDto = rentalService.getAnyRentalInfo(rentalId);
                 String responseMessage = rentalNotificationTemplates
                         .createGetRentalResponseMessage(
