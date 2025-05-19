@@ -1,7 +1,7 @@
 package com.carshare.rentalsystem.security;
 
-import com.carshare.rentalsystem.dto.user.UserLoginRequestDto;
-import com.carshare.rentalsystem.dto.user.UserLoginResponseDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UserLoginRequestDto;
+import com.carshare.rentalsystem.dto.user.response.dto.UserLoginResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

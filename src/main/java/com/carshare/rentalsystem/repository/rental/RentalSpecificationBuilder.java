@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.repository.rental;
 
-import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalSearchParameters;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.repository.SpecificationBuilder;
 import com.carshare.rentalsystem.repository.SpecificationProviderManager;

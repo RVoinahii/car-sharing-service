@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.dto.payment.even.dto;
 
-import com.carshare.rentalsystem.model.Payment;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 
-public record PaymentSuccessEventDto(Payment payment, Long userId) {
+public record PaymentSuccessEventDto(PaymentResponseDto payment, Long userId) {
 }

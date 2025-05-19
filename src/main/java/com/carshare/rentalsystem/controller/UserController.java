@@ -1,8 +1,8 @@
 package com.carshare.rentalsystem.controller;
 
-import com.carshare.rentalsystem.dto.user.UpdateUserRoleRequestDto;
-import com.carshare.rentalsystem.dto.user.UserResponseDto;
-import com.carshare.rentalsystem.dto.user.UserUpdateRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UpdateUserRoleRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UserUpdateRequestDto;
+import com.carshare.rentalsystem.dto.user.response.dto.UserResponseDto;
 import com.carshare.rentalsystem.model.User;
 import com.carshare.rentalsystem.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;

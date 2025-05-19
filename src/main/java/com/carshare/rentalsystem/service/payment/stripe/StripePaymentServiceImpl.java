@@ -1,12 +1,12 @@
 package com.carshare.rentalsystem.service.payment.stripe;
 
-import com.carshare.rentalsystem.dto.payment.CreatePaymentRequestDto;
-import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentCancelEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentSuccessEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.RenewPaymentEvenDto;
+import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.exception.ActiveRentalAlreadyExistsException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.exception.InvalidPaymentTypeException;
@@ -116,7 +116,9 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         payment.setCreatedAt(LocalDateTime.now());
         payment.setExpiredAt(LocalDateTime.now().plusHours(PAYMENT_SESSION_EXPIRATION_HOURS));
 
-        applicationEventPublisher.publishEvent(new RenewPaymentEvenDto(payment, userId));
+        PaymentResponseDto responseDto = paymentMapper.toDto(payment);
+
+        applicationEventPublisher.publishEvent(new RenewPaymentEvenDto(responseDto, userId));
 
         return paymentMapper.toPreviewDto(paymentRepository.save(payment));
     }
@@ -132,7 +134,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         PaymentResponseDto responseDto = paymentMapper.toDto(savedPayment);
 
-        applicationEventPublisher.publishEvent(new PaymentSuccessEventDto(payment,
+        applicationEventPublisher.publishEvent(new PaymentSuccessEventDto(responseDto,
                 payment.getRental().getUser().getId()));
 
         return responseDto;
@@ -145,9 +147,10 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                 () -> new EntityNotFoundException("Payment not found.")
         );
         PaymentCancelResponseDto responseDto = paymentMapper.toCancelDto(payment);
+        PaymentResponseDto responseDto1 = paymentMapper.toDto(payment);
         responseDto.setCancelMessage(CANCEL_PAYMENT_MESSAGE);
 
-        applicationEventPublisher.publishEvent(new PaymentCancelEventDto(payment,
+        applicationEventPublisher.publishEvent(new PaymentCancelEventDto(responseDto1,
                 payment.getRental().getUser().getId()));
 
         return responseDto;

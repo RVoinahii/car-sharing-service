@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.annotations;
 
-import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.request.dto.CreateRentalRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.service.payment.stripe;
 
-import com.carshare.rentalsystem.dto.payment.CreatePaymentRequestDto;
-import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
+import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

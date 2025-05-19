@@ -1,11 +1,10 @@
 package com.carshare.rentalsystem.service.rental;
 
-import com.carshare.rentalsystem.dto.rental.CreateRentalRequestDto;
-import com.carshare.rentalsystem.dto.rental.RentalPreviewResponseDto;
-import com.carshare.rentalsystem.dto.rental.RentalResponseDto;
-import com.carshare.rentalsystem.dto.rental.RentalSearchParameters;
 import com.carshare.rentalsystem.dto.rental.event.dto.RentalCreatedEventDto;
 import com.carshare.rentalsystem.dto.rental.event.dto.RentalReturnEventDto;
+import com.carshare.rentalsystem.dto.rental.request.dto.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalSearchParameters;
 import com.carshare.rentalsystem.exception.AccessDeniedException;
 import com.carshare.rentalsystem.exception.CarNotAvailableException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
@@ -62,13 +61,14 @@ public class RentalServiceImpl implements RentalService {
 
         rental.setUser(user);
         rental.setCar(car);
-        RentalResponseDto rentalResponseDto = rentalMapper.toDto(rentalRepository.save(rental));
+
+        RentalResponseDto responseDto = rentalMapper.toDto(rentalRepository.save(rental));
 
         applicationEventPublisher.publishEvent(
-                new RentalCreatedEventDto(rental, rental.getUser().getId())
+                new RentalCreatedEventDto(responseDto, rental.getUser().getId())
         );
 
-        return rentalResponseDto;
+        return responseDto;
     }
 
     @Transactional(readOnly = true)
@@ -91,13 +91,13 @@ public class RentalServiceImpl implements RentalService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<RentalPreviewResponseDto> getAllRentalsPreview(boolean isManager,
+    public Page<RentalResponseDto> getAllRentalsPreview(boolean isManager,
                                                                Long userId, Pageable pageable) {
         Page<Rental> rentals = isManager
                 ? rentalRepository.findAllWithUser(pageable)
                 : rentalRepository.findAllByUserIdWithUser(userId, pageable);
 
-        return rentals.map(rentalMapper::toPreviewDto);
+        return rentals.map(rentalMapper::toDto);
     }
 
     @Override
@@ -139,11 +139,13 @@ public class RentalServiceImpl implements RentalService {
         car.setInventory(car.getInventory() + CAR_INVENTORY_INCREMENT);
         carRepository.save(car);
 
+        RentalResponseDto responseDto = rentalMapper.toDto(rental);
+
         applicationEventPublisher.publishEvent(
-                new RentalReturnEventDto(rental, rental.getUser().getId())
+                new RentalReturnEventDto(responseDto, rental.getUser().getId())
         );
 
-        return rentalMapper.toDto(rental);
+        return responseDto;
     }
 
     private Car findCarById(Long carId) {
