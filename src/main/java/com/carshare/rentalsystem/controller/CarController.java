@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.controller;
 
-import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
-import com.carshare.rentalsystem.dto.car.CarResponseDto;
-import com.carshare.rentalsystem.dto.car.CreateCarRequestDto;
-import com.carshare.rentalsystem.dto.car.InventoryUpdateRequestDto;
+import com.carshare.rentalsystem.dto.car.request.dto.CreateCarRequestDto;
+import com.carshare.rentalsystem.dto.car.request.dto.InventoryUpdateRequestDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarResponseDto;
 import com.carshare.rentalsystem.service.car.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

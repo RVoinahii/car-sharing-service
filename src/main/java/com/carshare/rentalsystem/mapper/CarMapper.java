@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.mapper;
 
 import com.carshare.rentalsystem.config.MapperConfig;
-import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
-import com.carshare.rentalsystem.dto.car.CarResponseDto;
-import com.carshare.rentalsystem.dto.car.CreateCarRequestDto;
+import com.carshare.rentalsystem.dto.car.request.dto.CreateCarRequestDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarResponseDto;
 import com.carshare.rentalsystem.model.Car;
 import java.util.Optional;
 import org.mapstruct.Mapper;
@@ -18,7 +18,7 @@ public interface CarMapper {
 
     Car toEntity(CreateCarRequestDto requestDto);
 
-    @Named("toPreviewDto")
+    @Named("carToPreviewDto")
     CarPreviewResponseDto toPreviewDto(Car car);
 
     void updateCarFromDto(CreateCarRequestDto updatedCar, @MappingTarget Car existingCar);

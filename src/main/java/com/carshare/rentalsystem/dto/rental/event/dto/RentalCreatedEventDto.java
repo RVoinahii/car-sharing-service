@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.dto.rental.event.dto;
 
-import com.carshare.rentalsystem.model.Rental;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 
-public record RentalCreatedEventDto(Rental rental, Long userId) {
+public record RentalCreatedEventDto(RentalResponseDto rental, Long userId) {
 }

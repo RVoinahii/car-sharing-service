@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.service.car;
 
-import com.carshare.rentalsystem.dto.car.CarPreviewResponseDto;
-import com.carshare.rentalsystem.dto.car.CarResponseDto;
-import com.carshare.rentalsystem.dto.car.CreateCarRequestDto;
-import com.carshare.rentalsystem.dto.car.InventoryUpdateRequestDto;
+import com.carshare.rentalsystem.dto.car.request.dto.CreateCarRequestDto;
+import com.carshare.rentalsystem.dto.car.request.dto.InventoryUpdateRequestDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
+import com.carshare.rentalsystem.dto.car.response.dto.CarResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

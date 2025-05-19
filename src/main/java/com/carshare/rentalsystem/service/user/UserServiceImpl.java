@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.service.user;
 
-import com.carshare.rentalsystem.dto.user.UpdateUserRoleRequestDto;
-import com.carshare.rentalsystem.dto.user.UserRegistrationRequestDto;
-import com.carshare.rentalsystem.dto.user.UserResponseDto;
-import com.carshare.rentalsystem.dto.user.UserUpdateRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UpdateUserRoleRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UserRegistrationRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UserUpdateRequestDto;
+import com.carshare.rentalsystem.dto.user.response.dto.UserResponseDto;
 import com.carshare.rentalsystem.exception.EmailAlreadyExistsException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.exception.RegistrationException;

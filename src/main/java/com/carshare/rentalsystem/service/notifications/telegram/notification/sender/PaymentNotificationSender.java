@@ -1,44 +1,79 @@
 package com.carshare.rentalsystem.service.notifications.telegram.notification.sender;
 
-import com.carshare.rentalsystem.model.Payment;
+import com.carshare.rentalsystem.client.telegram.TelegramBotService;
+import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
+import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
+import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.service.notifications.NotificationSender;
 import com.carshare.rentalsystem.service.notifications.NotificationType;
-import com.carshare.rentalsystem.service.notifications.telegram.TelegramBotService;
-import com.carshare.rentalsystem.service.notifications.telegram.templates.NotificationRecipient;
-import com.carshare.rentalsystem.service.notifications.telegram.templates.PaymentNotificationTemplates;
 import java.util.EnumMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class PaymentNotificationSender implements NotificationSender {
+public class PaymentNotificationSender implements NotificationSender<PaymentResponseDto> {
     private final TelegramBotService telegramBotService;
-    private final PaymentNotificationTemplates paymentNotificationTemplates;
+    private final MessageTemplateDispatcher messageDispatcher;
 
     @Override
-    public void sendNotification(NotificationType type, Object notificationData, Long userId) {
-        if (!(notificationData instanceof Payment payment)) {
-            throw new IllegalArgumentException("Expected Rental as notification data");
-        }
-
-        EnumMap<NotificationRecipient, String> messages;
+    public void sendNotification(NotificationType type, PaymentResponseDto notificationData,
+                                 Long userId) {
+        EnumMap<MessageRecipient, String> messages = new EnumMap<>(MessageRecipient.class);
 
         switch (type) {
-            case SUCCESSFUL_PAYMENT ->
-                    messages = paymentNotificationTemplates
-                            .createSuccessfulPaymentMessages(payment);
+            case PAYMENT_SUCCESS_NOTIF -> {
+                String customerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_SUCCESS_MSG,
+                        MessageRecipient.RECIPIENT_CUSTOMER,
+                        notificationData
+                );
 
-            case PAYMENT_CANCEL ->
-                    messages = paymentNotificationTemplates.createPaymentCancelMessages(payment);
+                String managerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_SUCCESS_MSG,
+                        MessageRecipient.RECIPIENT_MANAGER,
+                        notificationData
+                );
+                messages.put(MessageRecipient.RECIPIENT_CUSTOMER, customerMessage);
+                messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
+            }
 
-            case RENEW_PAYMENT ->
-                    messages = paymentNotificationTemplates.createRenewPaymentMessage(payment);
+            case PAYMENT_CANCEL_NOTIF -> {
+                String customerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_CANCEL_MSG,
+                        MessageRecipient.RECIPIENT_CUSTOMER,
+                        notificationData
+                );
+
+                String managerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_CANCEL_MSG,
+                        MessageRecipient.RECIPIENT_MANAGER,
+                        notificationData
+                );
+                messages.put(MessageRecipient.RECIPIENT_CUSTOMER, customerMessage);
+                messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
+            }
+
+            case PAYMENT_RENEW_NOTIF -> {
+                String customerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_RENEW_MSG,
+                        MessageRecipient.RECIPIENT_CUSTOMER,
+                        notificationData
+                );
+
+                String managerMessage = messageDispatcher.createMessage(
+                        MessageType.PAYMENT_SUCCESS_MSG,
+                        MessageRecipient.RECIPIENT_MANAGER,
+                        notificationData
+                );
+                messages.put(MessageRecipient.RECIPIENT_CUSTOMER, customerMessage);
+                messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
+            }
 
             default -> throw new IllegalArgumentException(
                     "Unsupported notification type: " + type);
         }
-
         telegramBotService.notifyRecipients(messages, userId);
     }
 }

@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.annotations;
 
-import com.carshare.rentalsystem.dto.user.UserUpdateRequestDto;
+import com.carshare.rentalsystem.dto.user.request.dto.UserUpdateRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.stream.Stream;

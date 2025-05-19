@@ -1,9 +1,9 @@
 package com.carshare.rentalsystem.mapper;
 
 import com.carshare.rentalsystem.config.MapperConfig;
-import com.carshare.rentalsystem.dto.payment.PaymentCancelResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentPreviewResponseDto;
-import com.carshare.rentalsystem.dto.payment.PaymentResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.model.Payment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
