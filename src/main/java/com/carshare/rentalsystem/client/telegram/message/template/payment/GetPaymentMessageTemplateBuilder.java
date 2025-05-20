@@ -4,13 +4,15 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipie
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CancelPaymentMessageBuilder extends BasePaymentMessageBuilder<PaymentResponseDto> {
+public class GetPaymentMessageTemplateBuilder
+        extends BasePaymentMessageBuilder<PaymentResponseDto> {
     @Override
     public MessageType getMessageType() {
-        return MessageType.PAYMENT_CANCEL_MSG;
+        return MessageType.PAYMENT_INFO_MSG;
     }
 
     @Override
@@ -24,40 +26,34 @@ public class CancelPaymentMessageBuilder extends BasePaymentMessageBuilder<Payme
 
         return switch (recipient) {
             case RECIPIENT_CUSTOMER -> String.format(
-                    """
-                            ❌ Your payment was cancelled!
-                            
-                            💳 Payment Info:
-                            %s
-                            
-                            📅 Created At: %s
-                            ⏳ Expires At: %s
-                            
-                            The session remains accessible for 24 hours after creation.
-                            
-                            Please contact support if you have any questions.
-                            """,
-                    formatLitePaymentInfo(context),
-                    context.getCreatedAt(),
-                    context.getExpiredAt()
-            );
-            case RECIPIENT_MANAGER -> String.format(
-                    """
-                            ❌ Customer payment was cancelled!
+                    """                            
+                            ✅ Here is your rental details!
                             
                             📝 Rental Info:
                             %s
-                            
-                            💳 Payment Info:
+            
+                            💳 Payment:
                             %s
-                            
-                            📅 Created At: %s
-                            ⏳ Expires At: %s
+            
+                            ⏳ Paid At: %s
                             """,
                     formatRentalInfo(rental),
                     formatPaymentInfo(context),
-                    context.getCreatedAt(),
-                    context.getExpiredAt()
+                    LocalDateTime.now()
+            );
+            case RECIPIENT_MANAGER -> String.format(
+                    """                            
+                            📝 Rental Info:
+                            %s
+            
+                            💳 Payment:
+                            %s
+            
+                            ⏳ Paid At: %s
+                            """,
+                    formatRentalInfo(rental),
+                    formatPaymentInfo(context),
+                    LocalDateTime.now()
             );
         };
     }

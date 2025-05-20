@@ -3,7 +3,7 @@ package com.carshare.rentalsystem.client.telegram.message.template.payment;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
-import com.carshare.rentalsystem.dto.user.response.dto.UserPreviewResponseDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,12 +20,11 @@ public class RenewPaymentMessageBuilder extends BasePaymentMessageBuilder<Paymen
 
     @Override
     public String createMessage(MessageRecipient recipient, PaymentResponseDto context) {
-        UserPreviewResponseDto user = context.getRental().getUser();
+        RentalPreviewResponseDto rental = context.getRental();
 
         return switch (recipient) {
             case RECIPIENT_CUSTOMER -> String.format(
                     """
-                            👋 Hello, %s!
                             🔄 Your payment session has been renewed!
                             
                             💳 Payment Info:
@@ -39,8 +38,7 @@ public class RenewPaymentMessageBuilder extends BasePaymentMessageBuilder<Paymen
                             
                             If you face any issues, please contact support.
                             """,
-                    user.getFullName(),
-                    formatShortPaymentInfo(context),
+                    formatLitePaymentInfo(context),
                     context.getCreatedAt(),
                     context.getExpiredAt()
             );
@@ -48,7 +46,7 @@ public class RenewPaymentMessageBuilder extends BasePaymentMessageBuilder<Paymen
                     """
                             🔄 A payment session has been renewed by the customer.
                             
-                            👤 Customer:
+                            📝 Rental Info:
                             %s
                             
                             💳 Payment Info:
@@ -60,8 +58,8 @@ public class RenewPaymentMessageBuilder extends BasePaymentMessageBuilder<Paymen
                             The customer has requested to renew the payment session.
                             Please monitor the status in case further assistance is needed.
                             """,
-                    formatUserInfo(user),
-                    formatShortPaymentInfo(context),
+                    formatRentalInfo(rental),
+                    formatPaymentInfo(context),
                     context.getCreatedAt(),
                     context.getExpiredAt()
             );

@@ -13,7 +13,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         uses = RentalMapper.class)
 public interface PaymentMapper {
-    @Mapping(target = "rental", source = "rental", qualifiedByName = "toDto")
+    @Mapping(target = "rental", source = "rental", qualifiedByName = "rentalToPreviewDto")
     PaymentResponseDto toDto(Payment payment);
 
     PaymentCancelResponseDto toCancelDto(Payment payment);

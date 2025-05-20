@@ -54,11 +54,31 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Override
     public Page<PaymentResponseDto> getAllPayments(Long userId, Pageable pageable) {
         if (userId == null) {
-            return paymentRepository.findAllWithRentalAndCar(pageable).map(paymentMapper::toDto);
+            return paymentRepository.findAll(pageable).map(paymentMapper::toDto);
         }
 
-        return paymentRepository.findAllByRentalUserIdWithRentalAndUser(userId, pageable)
+        return paymentRepository.findAllByRentalUserId(userId, pageable)
                 .map(paymentMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PaymentResponseDto getAnyPaymentInfo(Long paymentId) {
+        Payment payment = findPaymentById(paymentId);
+
+        return paymentMapper.toDto(payment);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public PaymentResponseDto getCustomerPaymentInfo(Long userId, Long paymentId) {
+        Payment payment = findPaymentById(paymentId);
+
+        if (!payment.getRental().getUser().getId().equals(userId)) {
+            throw new EntityNotFoundException("Can't find paymentId with id: " + paymentId);
+        }
+
+        return paymentMapper.toDto(payment);
     }
 
     @Transactional
@@ -126,7 +146,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Transactional
     @Override
     public PaymentResponseDto handleSuccess(String sessionId) {
-        Payment payment = paymentRepository.findBySessionIdWithRentalAndUser(sessionId).orElseThrow(
+        Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new EntityNotFoundException("Payment not found.")
         );
 
@@ -143,7 +163,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Transactional(readOnly = true)
     @Override
     public PaymentCancelResponseDto handleCancel(String sessionId) {
-        Payment payment = paymentRepository.findBySessionIdWithRentalAndUser(sessionId).orElseThrow(
+        Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new EntityNotFoundException("Payment not found.")
         );
         PaymentCancelResponseDto responseDto = paymentMapper.toCancelDto(payment);
@@ -203,5 +223,11 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         payment.setExpiredAt(LocalDateTime.now().plusHours(PAYMENT_SESSION_EXPIRATION_HOURS));
 
         return payment;
+    }
+
+    private Payment findPaymentById(Long paymentId) {
+        return paymentRepository.findById(paymentId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find payment with ID: " + paymentId)
+        );
     }
 }
