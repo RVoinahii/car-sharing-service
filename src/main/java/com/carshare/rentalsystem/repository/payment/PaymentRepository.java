@@ -14,24 +14,18 @@ import org.springframework.data.repository.query.Param;
 public interface PaymentRepository extends JpaRepository<Payment, Long>,
         PagingAndSortingRepository<Payment, Long> {
 
-    @Query("SELECT p FROM Payment p JOIN FETCH p.rental r JOIN FETCH r.user u "
-            + "WHERE p.sessionId = :sessionId")
-    Optional<Payment> findBySessionIdWithRentalAndUser(@Param("sessionId") String sessionId);
+    @Query("SELECT p FROM Payment p WHERE p.sessionId = :sessionId")
+    Optional<Payment> findBySessionId(@Param("sessionId") String sessionId);
 
-    @Query("SELECT p FROM Payment p JOIN FETCH p.rental r JOIN FETCH r.user u "
-            + "WHERE u.id = :userId")
-    Page<Payment> findAllByRentalUserIdWithRentalAndUser(@Param("userId") Long userId,
+    @Query("SELECT p FROM Payment p WHERE p.rental.user.id = :userId")
+    Page<Payment> findAllByRentalUserId(@Param("userId") Long userId,
                                                          Pageable pageable);
 
     List<Payment> findByStatus(PaymentStatus status);
 
-    @Query("SELECT p FROM Payment p JOIN FETCH p.rental r JOIN FETCH r.car c "
-            + "WHERE p.id = :paymentId AND r.user.id = :userId")
+    @Query("SELECT p FROM Payment p WHERE p.id = :paymentId AND p.rental.user.id = :userId")
     Optional<Payment> findByIdAndRentalUserId(
             @Param("paymentId") Long paymentId, @Param("userId") Long userId);
-
-    @Query("SELECT p FROM Payment p JOIN FETCH p.rental r JOIN FETCH r.car c")
-    Page<Payment> findAllWithRentalAndCar(Pageable pageable);
 
     List<Payment> findByRentalUserIdAndStatus(Long userId, PaymentStatus status);
 }

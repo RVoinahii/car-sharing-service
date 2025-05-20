@@ -11,6 +11,10 @@ public interface StripePaymentService {
 
     Page<PaymentResponseDto> getAllPayments(Long userId, Pageable pageable);
 
+    PaymentResponseDto getAnyPaymentInfo(Long paymentId);
+
+    PaymentResponseDto getCustomerPaymentInfo(Long userId, Long paymentId);
+
     PaymentPreviewResponseDto createStripeSession(CreatePaymentRequestDto requestDto, Long userId);
 
     PaymentPreviewResponseDto renewStripeSession(Long userId, Long paymentId);

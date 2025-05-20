@@ -22,12 +22,8 @@ public interface RentalMapper {
     @Mapping(target = "car", source = "carId", qualifiedByName = "carById")
     Rental toEntity(CreateRentalRequestDto requestDto);
 
+    @Named("rentalToPreviewDto")
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "active", source = "rental", qualifiedByName = "isRentalActive")
+    @Mapping(target = "carId", source = "car.id")
     RentalPreviewResponseDto toPreviewDto(Rental rental);
-
-    @Named("isRentalActive")
-    default boolean isRentalActive(Rental rental) {
-        return rental.getActualReturnDate() == null;
-    }
 }

@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.dto.payment.response.dto;
 
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.model.Payment.PaymentStatus;
 import com.carshare.rentalsystem.model.Payment.PaymentType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,7 +15,7 @@ public class PaymentResponseDto {
     private Long id;
     private PaymentStatus status;
     private PaymentType type;
-    private RentalResponseDto rental;
+    private RentalPreviewResponseDto rental;
     private String sessionId;
     private String sessionUrl;
     private BigDecimal amountToPay;

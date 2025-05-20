@@ -49,6 +49,28 @@ public class PaymentController {
         return paymentService.getAllPayments(effectiveUserId, pageable);
     }
 
+    @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
+    @GetMapping("/{paymentId}")
+    @Operation(
+            summary = "Get payment details by ID",
+            description = "Returns detailed information about a specific payment by its ID."
+                    + "Customers can only access their own payments, while managers can access"
+                    + " any payment. (Required roles: CUSTOMER, MANAGER)"
+    )
+    public PaymentResponseDto getPaymentDetails(Authentication authentication,
+                                                @PathVariable Long paymentId) {
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
+
+        if (isManager) {
+            return paymentService.getAnyPaymentInfo(paymentId);
+        }
+
+        return paymentService.getCustomerPaymentInfo(
+                getAuthenticatedUserId(authentication), paymentId
+        );
+    }
+
     @GetMapping("/success")
     @Operation(
             summary = "Confirm payment success",

@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 public class RentalPreviewResponseDto {
     private Long id;
-    private boolean active;
     private Long userId;
+    private Long carId;
 }

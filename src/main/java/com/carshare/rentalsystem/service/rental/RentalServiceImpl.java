@@ -100,6 +100,7 @@ public class RentalServiceImpl implements RentalService {
         return rentals.map(rentalMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public RentalResponseDto getAnyRentalInfo(Long rentalId) {
         Rental rental = findRentalById(rentalId);
