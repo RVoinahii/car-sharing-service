@@ -3,6 +3,7 @@ package com.carshare.rentalsystem.client.telegram.message.template.payment;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateBuilder;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
+import com.carshare.rentalsystem.model.Payment;
 
 public abstract class BasePaymentMessageBuilder<T> implements MessageTemplateBuilder<T> {
     protected String formatLitePaymentInfo(PaymentResponseDto payment) {
@@ -40,5 +41,13 @@ public abstract class BasePaymentMessageBuilder<T> implements MessageTemplateBui
                 rental.getId(),
                 rental.getUserId(),
                 rental.getCarId());
+    }
+
+    protected String formatStatusEmoji(Payment.PaymentStatus status) {
+        return switch (status) {
+            case PENDING -> "⏳";
+            case PAID -> "✅";
+            case EXPIRED -> "❌";
+        };
     }
 }

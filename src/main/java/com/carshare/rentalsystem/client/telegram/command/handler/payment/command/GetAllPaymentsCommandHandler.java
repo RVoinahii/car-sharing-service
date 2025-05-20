@@ -1,4 +1,7 @@
-package com.carshare.rentalsystem.client.telegram.command.handler.rental.command;
+package com.carshare.rentalsystem.client.telegram.command.handler.payment.command;
+
+import static com.carshare.rentalsystem.client.telegram.command.handler.rental.command.GetAllRentalsCommandHandler.PAGE_INDEX_OFFSET;
+import static com.carshare.rentalsystem.client.telegram.command.handler.rental.command.GetAllRentalsCommandHandler.PAGE_SIZE;
 
 import com.carshare.rentalsystem.client.telegram.ActiveTelegramUserStorage;
 import com.carshare.rentalsystem.client.telegram.command.handler.PaginationKeyboardBuilder;
@@ -6,10 +9,10 @@ import com.carshare.rentalsystem.client.telegram.command.handler.TelegramCommand
 import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.model.User;
-import com.carshare.rentalsystem.service.rental.RentalService;
+import com.carshare.rentalsystem.service.payment.stripe.StripePaymentService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -20,20 +23,18 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class GetAllRentalsCommandHandler implements TelegramCommandHandler {
-    public static final int PAGE_SIZE = 5;
-    public static final String RENTALS_PAGE_CALLBACK_PREFIX = "rentals_page:";
-    public static final int PAGE_INDEX_OFFSET = 1;
+public class GetAllPaymentsCommandHandler implements TelegramCommandHandler {
+    public static final String PAYMENTS_PAGE_CALLBACK_PREFIX = "payments_page:";
 
-    private static final String GET_ALL_RENTALS_COMMAND = "/get_all_rentals";
+    private static final String GET_ALL_RENTAL_COMMAND = "/get_all_payments";
 
-    private final RentalService rentalService;
+    private final StripePaymentService stripePaymentService;
     private final ActiveTelegramUserStorage telegramUserStorage;
     private final MessageTemplateDispatcher templateDispatcher;
 
     @Override
     public String getCommand() {
-        return GET_ALL_RENTALS_COMMAND;
+        return GET_ALL_RENTAL_COMMAND;
     }
 
     @Override
@@ -51,9 +52,8 @@ public class GetAllRentalsCommandHandler implements TelegramCommandHandler {
         User user = telegramUserLink.getUser();
 
         int pageNumber = 0;
-        Page<RentalResponseDto> page = rentalService.getAllRentalsPreview(
-                user.isManager(),
-                telegramUserLink.getUserId(),
+        Page<PaymentResponseDto> page = stripePaymentService.getAllPayments(
+                user.isManager() ? null : user.getId(),
                 PageRequest.of(pageNumber, PAGE_SIZE)
         );
 
@@ -61,16 +61,16 @@ public class GetAllRentalsCommandHandler implements TelegramCommandHandler {
                 : MessageRecipient.RECIPIENT_CUSTOMER;
 
         String responseMessage = templateDispatcher.createMessage(
-                MessageType.RENTAL_LIST_MSG,
+                MessageType.PAYMENT_LIST_MSG,
                 recipient,
                 page);
 
         SendMessage sendMessage = new SendMessage(chatId, responseMessage)
                 .replyMarkup(PaginationKeyboardBuilder.create(
-                page.getNumber() + PAGE_INDEX_OFFSET,
-                page.getTotalPages(),
-                RENTALS_PAGE_CALLBACK_PREFIX)
-        );
+                        page.getNumber() + PAGE_INDEX_OFFSET,
+                        page.getTotalPages(),
+                        PAYMENTS_PAGE_CALLBACK_PREFIX)
+                );
 
         bot.execute(sendMessage);
     }
