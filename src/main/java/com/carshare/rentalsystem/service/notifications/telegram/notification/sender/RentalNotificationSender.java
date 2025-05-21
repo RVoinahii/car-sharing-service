@@ -55,6 +55,24 @@ public class RentalNotificationSender implements NotificationSender<RentalRespon
                 messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
             }
 
+            case RENTAL_DUE_SOON_NOTIF -> {
+                String customerMessage = messageDispatcher.createMessage(
+                        MessageType.RENTAL_DUE_SOON_MSG,
+                        MessageRecipient.RECIPIENT_CUSTOMER,
+                        notificationData
+                );
+                telegramBotService.notifyCustomer(customerMessage, userId);
+            }
+
+            case RENTAL_OVERDUE_NOTIF -> {
+                String customerMessage = messageDispatcher.createMessage(
+                        MessageType.RENTAL_OVERDUE_MSG,
+                        MessageRecipient.RECIPIENT_CUSTOMER,
+                        notificationData
+                );
+                telegramBotService.notifyCustomer(customerMessage, userId);
+            }
+
             default -> throw new IllegalArgumentException(
                     "Unsupported notification type: " + type);
         }

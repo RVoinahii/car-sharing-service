@@ -34,7 +34,7 @@ public class RentalListPageMessageBuilder
             builder.append("🔹 Rental ID: ")
                     .append(rental.getId())
                     .append(" — ")
-                    .append(rental.getActualReturnDate() != null ? "▶ Active" : "✅ Completed");
+                    .append(rental.getActualReturnDate() == null ? "▶ Active" : "✅ Completed");
 
             if (recipient.name().equals(MessageRecipient.RECIPIENT_MANAGER.name())) {
                 builder.append(" — 👤 User ID: ").append(rental.getUser().getId());
