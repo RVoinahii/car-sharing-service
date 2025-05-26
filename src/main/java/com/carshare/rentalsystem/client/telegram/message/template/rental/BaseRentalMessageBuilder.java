@@ -33,9 +33,11 @@ public abstract class BaseRentalMessageBuilder<T> implements MessageTemplateBuil
                                Rental ID: %s
                                Rental Start: %s
                                Rental End: %s
+                               Rental Status: %s
                             """,
                 rental.getId(),
                 rental.getRentalDate(),
-                rental.getReturnDate());
+                rental.getReturnDate(),
+                rental.getStatus());
     }
 }

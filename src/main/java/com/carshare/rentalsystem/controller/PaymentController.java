@@ -74,8 +74,8 @@ public class PaymentController {
     @GetMapping("/success")
     @Operation(
             summary = "Confirm payment success",
-            description = "Handles a successful Stripe session and marks the corresponding"
-                    + "  payment as PAID. Used internally by Stripe after user completes payment."
+            description = "Handles a successful Stripe session and marks the corresponding payment"
+                    + " as COMPLETED. Used internally by Stripe after user completes payment."
                     + " (Required roles: CUSTOMER, MANAGER)"
     )
     public PaymentResponseDto paymentSuccess(@RequestParam("session_id") String sessionId) {

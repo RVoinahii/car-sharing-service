@@ -38,6 +38,11 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: rentals
             baseColumnNames: car_id

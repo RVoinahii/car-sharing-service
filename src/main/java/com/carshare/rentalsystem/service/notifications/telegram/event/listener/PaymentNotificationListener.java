@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.service.notifications.telegram.event.listener;
 
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentCancelEventDto;
+import com.carshare.rentalsystem.dto.payment.even.dto.PaymentExpiredEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentSuccessEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.RenewPaymentEvenDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
@@ -33,6 +34,13 @@ public class PaymentNotificationListener {
     public void handleRenewPayment(RenewPaymentEvenDto event) {
         paymentNotificationSender.sendNotification(
                 NotificationType.PAYMENT_RENEW_NOTIF, event.payment(), event.userId()
+        );
+    }
+
+    @EventListener
+    public void handleExpiredPayment(PaymentExpiredEventDto event) {
+        paymentNotificationSender.sendNotification(
+                NotificationType.PAYMENT_EXPIRED_NOTIF, event.payment(), event.userId()
         );
     }
 }

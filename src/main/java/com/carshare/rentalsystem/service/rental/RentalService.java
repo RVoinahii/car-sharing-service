@@ -1,8 +1,8 @@
 package com.carshare.rentalsystem.service.rental;
 
 import com.carshare.rentalsystem.dto.rental.request.dto.CreateRentalRequestDto;
+import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalSearchParameters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

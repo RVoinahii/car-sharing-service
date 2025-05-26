@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.repository.rental;
 
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalSearchParameters;
+import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.repository.SpecificationBuilder;
 import com.carshare.rentalsystem.repository.SpecificationProviderManager;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RentalSpecificationBuilder implements SpecificationBuilder<Rental> {
     public static final String USER_ID = "userId";
-    public static final String IS_ACTIVE = "isActive";
+    public static final String RENTAL_STATUS = "status";
 
     private final SpecificationProviderManager<Rental> rentalSpecificationProviderManager;
 
@@ -25,10 +25,10 @@ public class RentalSpecificationBuilder implements SpecificationBuilder<Rental> 
                     .getSpecification(searchParameters.userId()));
         }
 
-        if (searchParameters.isActive() != null) {
-            String value = String.valueOf(searchParameters.isActive());
+        if (searchParameters.status() != null) {
+            String value = searchParameters.status().name();
             spec = spec.and(rentalSpecificationProviderManager
-                    .getSpecificationProvider(IS_ACTIVE)
+                    .getSpecificationProvider(RENTAL_STATUS)
                     .getSpecification(value));
         }
         return spec;

@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.dto.rental.request.dto;
 
-import com.carshare.rentalsystem.annotations.ReturnAfterRentalDate;
+import com.carshare.rentalsystem.annotations.ValidRentalPeriod;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Setter
 @Getter
-@ReturnAfterRentalDate
+@ValidRentalPeriod
 public class CreateRentalRequestDto {
     @Positive
     private Long carId;

@@ -8,74 +8,57 @@ import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 import com.carshare.rentalsystem.service.notifications.NotificationSender;
 import com.carshare.rentalsystem.service.notifications.NotificationType;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
 public class RentalNotificationSender implements NotificationSender<RentalResponseDto> {
-    private final TelegramBotService telegramBotService;
-    private final MessageTemplateDispatcher messageDispatcher;
+    private static final Set<NotificationType> DUAL_RECIPIENT_TYPES = Set.of(
+            NotificationType.RENTAL_NEW_NOTIF,
+            NotificationType.RENTAL_RETURN_NOTIF
+    );
 
+    private static final Set<NotificationType> SINGLE_RECIPIENT_TYPES = Set.of(
+            NotificationType.RENTAL_DUE_SOON_NOTIF,
+            NotificationType.RENTAL_OVERDUE_NOTIF,
+            NotificationType.RENTAL_START_NOTIF
+    );
+
+    private final MessageTemplateDispatcher messageDispatcher;
+    private final TelegramBotService telegramBotService;
+
+    @Async
     @Override
     public void sendNotification(NotificationType type, RentalResponseDto notificationData,
                                  Long userId) {
         EnumMap<MessageRecipient, String> messages = new EnumMap<>(MessageRecipient.class);
 
-        switch (type) {
-            case RENTAL_NEW_NOTIF -> {
-                String customerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_NEW_MSG,
-                        MessageRecipient.RECIPIENT_CUSTOMER,
-                        notificationData
-                );
-
-                String managerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_NEW_MSG,
-                        MessageRecipient.RECIPIENT_MANAGER,
-                        notificationData
-                );
-                messages.put(MessageRecipient.RECIPIENT_CUSTOMER, customerMessage);
-                messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
+        if (DUAL_RECIPIENT_TYPES.contains(type)) {
+            for (MessageRecipient recipient : List.of(MessageRecipient.RECIPIENT_CUSTOMER,
+                    MessageRecipient.RECIPIENT_MANAGER)) {
+                MessageType messageType = MessageType.mapNotificationToMessageType(type);
+                String message = messageDispatcher.createMessage(
+                        messageType,
+                        recipient,
+                        notificationData);
+                messages.put(recipient, message);
             }
 
-            case RENTAL_RETURN_NOTIF -> {
-                String customerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_RETURN_MSG,
-                        MessageRecipient.RECIPIENT_CUSTOMER,
-                        notificationData
-                );
+            telegramBotService.notifyRecipients(messages, userId);
+        } else if (SINGLE_RECIPIENT_TYPES.contains(type)) {
+            MessageType messageType = MessageType.mapNotificationToMessageType(type);
+            String message = messageDispatcher.createMessage(
+                    messageType,
+                    MessageRecipient.RECIPIENT_CUSTOMER,
+                    notificationData);
 
-                String managerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_RETURN_MSG,
-                        MessageRecipient.RECIPIENT_MANAGER,
-                        notificationData
-                );
-                messages.put(MessageRecipient.RECIPIENT_CUSTOMER, customerMessage);
-                messages.put(MessageRecipient.RECIPIENT_MANAGER, managerMessage);
-            }
-
-            case RENTAL_DUE_SOON_NOTIF -> {
-                String customerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_DUE_SOON_MSG,
-                        MessageRecipient.RECIPIENT_CUSTOMER,
-                        notificationData
-                );
-                telegramBotService.notifyCustomer(customerMessage, userId);
-            }
-
-            case RENTAL_OVERDUE_NOTIF -> {
-                String customerMessage = messageDispatcher.createMessage(
-                        MessageType.RENTAL_OVERDUE_MSG,
-                        MessageRecipient.RECIPIENT_CUSTOMER,
-                        notificationData
-                );
-                telegramBotService.notifyCustomer(customerMessage, userId);
-            }
-
-            default -> throw new IllegalArgumentException(
-                    "Unsupported notification type: " + type);
+            telegramBotService.notifyCustomer(message, userId);
+        } else {
+            throw new IllegalArgumentException("Unsupported notification type: " + type);
         }
-        telegramBotService.notifyRecipients(messages, userId);
     }
 }

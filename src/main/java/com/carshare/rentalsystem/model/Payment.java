@@ -60,6 +60,7 @@ public class Payment {
 
     public enum PaymentType {
         PAYMENT,
-        FINE
+        FINE,
+        CANCELLATION_FEE
     }
 }

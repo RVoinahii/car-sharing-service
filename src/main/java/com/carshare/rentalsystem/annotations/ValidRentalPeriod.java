@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ReturnAfterRentalValidator.class)
-public @interface ReturnAfterRentalDate {
-    String message() default "Return date must be after rental date";
+@Constraint(validatedBy = ValidRentalPeriodValidator.class)
+public @interface ValidRentalPeriod {
+    String message() default "Return date must be after rental date and not exceed 14 days";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
