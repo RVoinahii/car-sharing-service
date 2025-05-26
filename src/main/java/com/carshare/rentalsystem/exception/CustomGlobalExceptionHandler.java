@@ -26,9 +26,9 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(ActiveRentalAlreadyExistsException.class)
+    @ExceptionHandler(ActiveSessionAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleActiveRentalAlreadyExistsExceptions(
-            ActiveRentalAlreadyExistsException exception) {
+            ActiveSessionAlreadyExistsException exception) {
         return buildErrorResponse(exception, HttpStatus.CONFLICT);
     }
 

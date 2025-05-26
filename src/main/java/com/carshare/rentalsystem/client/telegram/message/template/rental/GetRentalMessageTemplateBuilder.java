@@ -30,12 +30,6 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
         boolean isLate = isReturned && actualReturn.isAfter(expectedReturn);
         long delayDays = isLate ? ChronoUnit.DAYS.between(expectedReturn, actualReturn) : 0;
 
-        String rentalStatus = isReturned
-                ? isLate
-                ? "⏰ Returned late (" + delayDays + " day(s) delay)"
-                : "✅ Returned on time"
-                : "📅 Rental is still active";
-
         return switch (recipient) {
             case RECIPIENT_CUSTOMER -> String.format("""
                 ✅ Here is your rental details!
@@ -50,8 +44,7 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
                     Rental Start: %s
                     Rental Expected End: %s
                     Rental Actual End: %s
-
-                %s
+                    Rental Status: %s
                 """,
                     car.getBrand(),
                     car.getModel(),
@@ -60,7 +53,7 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
                     context.getRentalDate(),
                     context.getReturnDate(),
                     context.getActualReturnDate(),
-                    rentalStatus
+                    context.getStatus()
             );
             case RECIPIENT_MANAGER -> String.format("""
                 👤 Customer:
@@ -76,8 +69,6 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
                     Rental Start: %s
                     Rental Expected End: %s
                     Rental Actual End: %s
-
-                %s
                 """,
                     context.getUser().getId(),
                     car.getBrand(),
@@ -86,8 +77,7 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
                     context.getId(),
                     context.getRentalDate(),
                     context.getReturnDate(),
-                    context.getActualReturnDate(),
-                    rentalStatus
+                    context.getActualReturnDate()
             );
         };
     }

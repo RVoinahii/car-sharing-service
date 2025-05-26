@@ -9,4 +9,5 @@ public class RentalPreviewResponseDto {
     private Long id;
     private Long userId;
     private Long carId;
+    private String status;
 }

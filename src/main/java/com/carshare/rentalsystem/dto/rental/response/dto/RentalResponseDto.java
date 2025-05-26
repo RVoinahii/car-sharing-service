@@ -23,4 +23,5 @@ public class RentalResponseDto {
 
     private CarPreviewResponseDto car;
     private UserPreviewResponseDto user;
+    private String status;
 }

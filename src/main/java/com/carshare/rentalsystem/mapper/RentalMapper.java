@@ -17,6 +17,7 @@ public interface RentalMapper {
     @Named("toDto")
     @Mapping(target = "car", source = "car", qualifiedByName = "carToPreviewDto")
     @Mapping(target = "user", source = "user", qualifiedByName = "userToPreviewDto")
+    @Mapping(target = "status", source = "status", qualifiedByName = "mapRentalStatus")
     RentalResponseDto toDto(Rental rental);
 
     @Mapping(target = "car", source = "carId", qualifiedByName = "carById")
@@ -25,5 +26,11 @@ public interface RentalMapper {
     @Named("rentalToPreviewDto")
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "carId", source = "car.id")
+    @Mapping(target = "status", source = "status", qualifiedByName = "mapRentalStatus")
     RentalPreviewResponseDto toPreviewDto(Rental rental);
+
+    @Named("mapRentalStatus")
+    default String mapStatus(Rental.RentalStatus status) {
+        return status.name();
+    }
 }
