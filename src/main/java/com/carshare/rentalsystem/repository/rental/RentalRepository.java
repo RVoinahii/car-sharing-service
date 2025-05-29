@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,12 +21,8 @@ public interface RentalRepository extends JpaRepository<Rental, Long>,
             + " WHERE r.user.id = :userId")
     Page<Rental> findAllByUserIdWithCarAndUser(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT r FROM Rental r JOIN FETCH r.user"
-            + " WHERE r.user.id = :userId")
-    Page<Rental> findAllByUserIdWithUser(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT r FROM Rental r JOIN FETCH r.user")
-    Page<Rental> findAllWithUser(Pageable pageable);
+    @EntityGraph(attributePaths = {"user", "car"})
+    Page<Rental> findAll(Specification<Rental> spec, Pageable pageable);
 
     @Query("SELECT r FROM Rental r JOIN FETCH r.car c JOIN FETCH r.user u WHERE r.id = :rentalId")
     Optional<Rental> findByIdWithCarAndUser(@Param("rentalId") Long rentalId);

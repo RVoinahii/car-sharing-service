@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RentalStatusSpecificationProvider implements SpecificationProvider<Rental> {
-    private static final String STRING_BOOLEAN_TRUE = "true";
 
     @Override
     public String getKey() {
@@ -18,7 +17,6 @@ public class RentalStatusSpecificationProvider implements SpecificationProvider<
 
     @Override
     public Specification<Rental> getSpecification(String params) {
-        boolean isActive = STRING_BOOLEAN_TRUE.equalsIgnoreCase(params);
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(
                         root.get(RENTAL_STATUS),

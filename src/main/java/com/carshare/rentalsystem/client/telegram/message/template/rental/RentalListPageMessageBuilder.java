@@ -5,6 +5,7 @@ import static com.carshare.rentalsystem.client.telegram.command.handler.rental.c
 import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.model.Rental;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +32,13 @@ public class RentalListPageMessageBuilder
         builder.append(String.format("📋 Rentals — page %d of %d:\n\n", currentPage, totalPages));
 
         for (RentalResponseDto rental : context.getContent()) {
+            String emoji = formatStatusEmoji(Rental.RentalStatus.valueOf(rental.getStatus()));
+
             builder.append("🔹 Rental ID: ")
                     .append(rental.getId())
                     .append(" — ")
-                    .append("🔹 Status: ")
+                    .append(emoji)
+                    .append(" ")
                     .append(rental.getStatus());
 
             if (recipient.name().equals(MessageRecipient.RECIPIENT_MANAGER.name())) {

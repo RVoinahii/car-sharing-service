@@ -16,9 +16,6 @@ public interface RentalService {
     Page<RentalResponseDto> getSpecificRentals(RentalSearchParameters params,
                                                Pageable pageable);
 
-    Page<RentalResponseDto> getAllRentalsPreview(boolean isManager, Long userId,
-                                                        Pageable pageable);
-
     RentalResponseDto getAnyRentalInfo(Long rentalId);
 
     RentalResponseDto getCustomerRentalInfo(Long userId, Long rentalId);

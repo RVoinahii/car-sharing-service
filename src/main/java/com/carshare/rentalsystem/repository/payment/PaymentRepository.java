@@ -6,13 +6,16 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long>,
-        PagingAndSortingRepository<Payment, Long> {
+        JpaSpecificationExecutor<Payment>, PagingAndSortingRepository<Payment, Long> {
 
     @Query("SELECT p FROM Payment p JOIN FETCH p.rental WHERE p.sessionId = :sessionId")
     Optional<Payment> findBySessionIdWithRental(@Param("sessionId") String sessionId);
@@ -23,6 +26,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>,
     @Query("SELECT p FROM Payment p WHERE p.rental.user.id = :userId")
     Page<Payment> findAllByRentalUserId(@Param("userId") Long userId,
                                                          Pageable pageable);
+
+    @EntityGraph(attributePaths = {"rental", "rental.user", "rental.car"})
+    Page<Payment> findAll(Specification<Payment> spec, Pageable pageable);
 
     @Query("""
     SELECT p

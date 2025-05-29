@@ -1,8 +1,6 @@
 package com.carshare.rentalsystem.dto.payment.response.dto;
 
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
-import com.carshare.rentalsystem.model.Payment.PaymentStatus;
-import com.carshare.rentalsystem.model.Payment.PaymentType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,8 +11,8 @@ import lombok.Setter;
 @Getter
 public class PaymentResponseDto {
     private Long id;
-    private PaymentStatus status;
-    private PaymentType type;
+    private String status;
+    private String type;
     private RentalPreviewResponseDto rental;
     private String sessionId;
     private String sessionUrl;

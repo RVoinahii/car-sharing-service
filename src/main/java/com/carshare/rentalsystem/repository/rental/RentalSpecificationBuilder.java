@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class RentalSpecificationBuilder implements SpecificationBuilder<Rental> {
+public class RentalSpecificationBuilder implements SpecificationBuilder<Rental,
+        RentalSearchParameters> {
     public static final String USER_ID = "userId";
     public static final String RENTAL_STATUS = "status";
 

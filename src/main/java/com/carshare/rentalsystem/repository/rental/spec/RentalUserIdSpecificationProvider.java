@@ -4,11 +4,12 @@ import static com.carshare.rentalsystem.repository.rental.RentalSpecificationBui
 
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.repository.SpecificationProvider;
+import jakarta.persistence.criteria.Path;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserIdSpecificationProvider implements SpecificationProvider<Rental> {
+public class RentalUserIdSpecificationProvider implements SpecificationProvider<Rental> {
 
     @Override
     public String getKey() {
@@ -17,7 +18,9 @@ public class UserIdSpecificationProvider implements SpecificationProvider<Rental
 
     @Override
     public Specification<Rental> getSpecification(String params) {
-        return (root, query, criteriaBuilder) ->
-                root.get(USER_ID).in(params);
+        return (root, query, criteriaBuilder) -> {
+            Path<Long> userIdPath = root.get("user").get("id");
+            return criteriaBuilder.equal(userIdPath, Long.valueOf(params));
+        };
     }
 }

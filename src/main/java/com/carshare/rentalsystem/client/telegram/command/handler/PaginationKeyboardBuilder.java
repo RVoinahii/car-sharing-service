@@ -11,19 +11,32 @@ public class PaginationKeyboardBuilder {
     private static final String PREVIOUS_BUTTON_TEXT = "⬅️ Previous";
     private static final String NEXT_BUTTON_TEXT = "➡️ Next";
 
-    public static InlineKeyboardMarkup create(int currentPage, int totalPages, String prefix) {
+    public static InlineKeyboardMarkup create(int currentPage, int totalPages, String prefix,
+                                              String... extraParams) {
         List<InlineKeyboardButton> row = new ArrayList<>();
 
         if (currentPage > MIN_PAGE_NUMBER) {
             row.add(new InlineKeyboardButton(PREVIOUS_BUTTON_TEXT)
-                    .callbackData(prefix + (currentPage - PAGE_STEP)));
+                    .callbackData(buildCallbackData(prefix, currentPage - PAGE_STEP, extraParams)));
         }
 
         if (currentPage < totalPages) {
             row.add(new InlineKeyboardButton(NEXT_BUTTON_TEXT)
-                    .callbackData(prefix + (currentPage + PAGE_STEP)));
+                    .callbackData(buildCallbackData(prefix, currentPage + PAGE_STEP, extraParams)));
         }
 
         return new InlineKeyboardMarkup(row.toArray(new InlineKeyboardButton[0]));
+    }
+
+    private static String buildCallbackData(String prefix, int page, String... extraParams) {
+        StringBuilder callbackData = new StringBuilder(prefix).append(page);
+
+        for (String param : extraParams) {
+            if (param != null && !param.isEmpty()) {
+                callbackData.append(":").append(param);
+            }
+        }
+
+        return callbackData.toString();
     }
 }

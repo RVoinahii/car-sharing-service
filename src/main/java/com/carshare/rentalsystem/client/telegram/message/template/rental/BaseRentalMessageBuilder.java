@@ -4,6 +4,7 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplat
 import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 import com.carshare.rentalsystem.dto.user.response.dto.UserPreviewResponseDto;
+import com.carshare.rentalsystem.model.Rental;
 
 public abstract class BaseRentalMessageBuilder<T> implements MessageTemplateBuilder<T> {
     protected String formatUserInfo(UserPreviewResponseDto user) {
@@ -39,5 +40,15 @@ public abstract class BaseRentalMessageBuilder<T> implements MessageTemplateBuil
                 rental.getRentalDate(),
                 rental.getReturnDate(),
                 rental.getStatus());
+    }
+
+    protected String formatStatusEmoji(Rental.RentalStatus status) {
+        return switch (status) {
+            case RESERVED -> "📅";
+            case ACTIVE -> "▶";
+            case WAITING_FOR_PAYMENT -> "💳";
+            case COMPLETED -> "✅";
+            case CANCELLED -> "❌";
+        };
     }
 }

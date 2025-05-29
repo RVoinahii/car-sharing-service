@@ -5,6 +5,7 @@ import static com.carshare.rentalsystem.client.telegram.command.handler.rental.c
 import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
+import com.carshare.rentalsystem.model.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +32,7 @@ public class PaymentListPageMessageBuilder
         builder.append(String.format("📋 Payments — page %d of %d:\n\n", currentPage, totalPages));
 
         for (PaymentResponseDto payment : context.getContent()) {
-            String emoji = formatStatusEmoji(payment.getStatus());
+            String emoji = formatStatusEmoji(Payment.PaymentStatus.valueOf(payment.getStatus()));
 
             builder.append("🔹 Payment ID: ")
                     .append(payment.getId())
