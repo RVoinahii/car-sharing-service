@@ -102,17 +102,6 @@ public class RentalServiceImpl implements RentalService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<RentalResponseDto> getAllRentalsPreview(boolean isManager,
-                                                               Long userId, Pageable pageable) {
-        Page<Rental> rentals = isManager
-                ? rentalRepository.findAllWithUser(pageable)
-                : rentalRepository.findAllByUserIdWithUser(userId, pageable);
-
-        return rentals.map(rentalMapper::toDto);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public RentalResponseDto getAnyRentalInfo(Long rentalId) {
         Rental rental = findRentalById(rentalId);
 
@@ -147,7 +136,8 @@ public class RentalServiceImpl implements RentalService {
         LocalDate today = LocalDate.now();
         LocalDate rentalStartDate = rental.getRentalDate();
 
-        if (!today.isBefore(rentalStartDate.minusDays(MAX_EARLY_CANCEL_DAYS))) {
+        if (rental.getStatus() == Rental.RentalStatus.RESERVED
+                && !today.isBefore(rentalStartDate.minusDays(MAX_EARLY_CANCEL_DAYS))) {
             throw new IllegalStateException("You can only cancel the rental max "
                     + MAX_EARLY_CANCEL_DAYS + " days before the rental date");
         }

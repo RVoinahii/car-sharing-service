@@ -1,7 +1,6 @@
 package com.carshare.rentalsystem.client.telegram.command.handler.callback.handler.payment.callback;
 
 import static com.carshare.rentalsystem.client.telegram.command.handler.callback.handler.rental.callback.AllRentalsCallbackHandler.FIRST_PAGE_INDEX;
-import static com.carshare.rentalsystem.client.telegram.command.handler.callback.handler.rental.callback.AllRentalsCallbackHandler.PAGE_NUMBER_PART;
 import static com.carshare.rentalsystem.client.telegram.command.handler.callback.handler.rental.callback.AllRentalsCallbackHandler.PAGE_SPLIT_DELIMITER;
 import static com.carshare.rentalsystem.client.telegram.command.handler.payment.command.GetAllPaymentsCommandHandler.PAYMENTS_PAGE_CALLBACK_PREFIX;
 import static com.carshare.rentalsystem.client.telegram.command.handler.rental.command.GetAllRentalsCommandHandler.PAGE_INDEX_OFFSET;
@@ -13,7 +12,9 @@ import com.carshare.rentalsystem.client.telegram.command.handler.callback.handle
 import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipient;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
+import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
+import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.model.User;
 import com.carshare.rentalsystem.service.payment.stripe.StripePaymentService;
@@ -64,41 +65,81 @@ public class AllPaymentsCallbackHandler implements TelegramCallbackHandler {
         }
 
         User user = telegramUserLink.getUser();
+        String[] dataParts = callbackData.split(PAGE_SPLIT_DELIMITER);
+        int pageNumber = parsePageNumber(dataParts);
 
-        if (callbackData.startsWith(PAYMENTS_PAGE_CALLBACK_PREFIX)) {
-            int pageNumber = parsePageNumber(callbackData);
+        Page<PaymentResponseDto> page;
+        PaymentSearchParameters searchParameters = null;
 
-            Page<PaymentResponseDto> page = stripePaymentService.getAllPayments(
-                    user.isManager() ? null : user.getId(),
+        if (user.isManager()) {
+            searchParameters = parseSearchParametersFromCallbackParts(dataParts);
+            page = stripePaymentService.getSpecificPayments(
+                    searchParameters,
                     PageRequest.of(pageNumber, PAGE_SIZE)
             );
-
-            MessageRecipient recipient = user.isManager() ? MessageRecipient.RECIPIENT_MANAGER
-                    : MessageRecipient.RECIPIENT_CUSTOMER;
-
-            String response = templateDispatcher.createMessage(
-                    MessageType.PAYMENT_LIST_MSG,
-                    recipient,
-                    page);
-
-            InlineKeyboardMarkup keyboardMarkup = PaginationKeyboardBuilder.create(
-                    page.getNumber() + PAGE_INDEX_OFFSET,
-                    page.getTotalPages(),
-                    PAYMENTS_PAGE_CALLBACK_PREFIX);
-
-            EditMessageText editMessage = new EditMessageText(chatId,
-                    message.messageId(), response).replyMarkup(keyboardMarkup);
-
-            bot.execute(editMessage);
+        } else {
+            page = stripePaymentService.getPaymentsById(
+                    telegramUserLink.getUserId(),
+                    PageRequest.of(pageNumber, PAGE_SIZE)
+            );
         }
+
+        MessageRecipient recipient = user.isManager()
+                ? MessageRecipient.RECIPIENT_MANAGER
+                : MessageRecipient.RECIPIENT_CUSTOMER;
+
+        String response = templateDispatcher.createMessage(
+                MessageType.PAYMENT_LIST_MSG,
+                recipient,
+                page);
+
+        String userIdPart = null;
+        String statusPart = null;
+
+        if (searchParameters != null) {
+            userIdPart = searchParameters.userId();
+            statusPart = searchParameters.status() != null
+                    ? searchParameters.status().name()
+                    : null;
+        }
+
+        InlineKeyboardMarkup keyboardMarkup = PaginationKeyboardBuilder.create(
+                page.getNumber() + PAGE_INDEX_OFFSET,
+                page.getTotalPages(),
+                PAYMENTS_PAGE_CALLBACK_PREFIX,
+                userIdPart,
+                statusPart);
+
+        EditMessageText editMessage = new EditMessageText(chatId,
+                message.messageId(), response).replyMarkup(keyboardMarkup);
+
+        bot.execute(editMessage);
     }
 
-    private int parsePageNumber(String callbackData) {
+    private int parsePageNumber(String[] dataParts) {
         try {
-            return Integer.parseInt(callbackData
-                    .split(PAGE_SPLIT_DELIMITER)[PAGE_NUMBER_PART]) - PAGE_INDEX_OFFSET;
+            return Integer.parseInt(dataParts[1]) - PAGE_INDEX_OFFSET;
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return FIRST_PAGE_INDEX;
         }
+    }
+
+    private PaymentSearchParameters parseSearchParametersFromCallbackParts(String[] dataParts) {
+        String userId = null;
+        Payment.PaymentStatus status = null;
+
+        for (int i = 2; i < dataParts.length; i++) {
+            String token = dataParts[i].trim();
+            if (token.isEmpty()) {
+                continue;
+            }
+            try {
+                status = Payment.PaymentStatus.valueOf(token.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                userId = token;
+            }
+        }
+
+        return new PaymentSearchParameters(userId, status);
     }
 }

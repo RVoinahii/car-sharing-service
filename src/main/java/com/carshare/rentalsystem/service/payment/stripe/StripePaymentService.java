@@ -1,6 +1,7 @@
 package com.carshare.rentalsystem.service.payment.stripe;
 
 import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
@@ -9,7 +10,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface StripePaymentService {
 
-    Page<PaymentResponseDto> getAllPayments(Long userId, Pageable pageable);
+    Page<PaymentResponseDto> getSpecificPayments(PaymentSearchParameters searchParameters,
+                                                 Pageable pageable);
+
+    Page<PaymentResponseDto> getPaymentsById(Long userId, Pageable pageable);
 
     PaymentResponseDto getAnyPaymentInfo(Long paymentId);
 

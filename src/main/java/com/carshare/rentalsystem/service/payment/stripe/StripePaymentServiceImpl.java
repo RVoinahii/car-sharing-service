@@ -4,6 +4,7 @@ import com.carshare.rentalsystem.dto.payment.even.dto.PaymentCancelEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentSuccessEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.RenewPaymentEvenDto;
 import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
@@ -17,6 +18,7 @@ import com.carshare.rentalsystem.model.Payment.PaymentType;
 import com.carshare.rentalsystem.model.PaymentSession;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.repository.payment.PaymentRepository;
+import com.carshare.rentalsystem.repository.payment.PaymentSpecificationBuilder;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
 import com.carshare.rentalsystem.service.payment.PaymentProvider;
 import com.carshare.rentalsystem.service.payment.RentalPaymentCalculator;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +45,24 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentProvider paymentProvider;
     private final PaymentMapper paymentMapper;
+    private final PaymentSpecificationBuilder paymentSpecificationBuilder;
     private final RentalPaymentCalculator rentalPaymentCalculator;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     @Override
-    public Page<PaymentResponseDto> getAllPayments(Long userId, Pageable pageable) {
-        if (userId == null) {
-            return paymentRepository.findAll(pageable).map(paymentMapper::toDto);
-        }
+    public Page<PaymentResponseDto> getPaymentsById(Long userId, Pageable pageable) {
+        return paymentRepository.findAllByRentalUserId(userId, pageable).map(paymentMapper::toDto);
+    }
 
-        return paymentRepository.findAllByRentalUserId(userId, pageable)
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PaymentResponseDto> getSpecificPayments(PaymentSearchParameters searchParameters,
+                                                        Pageable pageable) {
+        Specification<Payment> paymentSpecification =
+                paymentSpecificationBuilder.build(searchParameters);
+
+        return paymentRepository.findAll(paymentSpecification, pageable)
                 .map(paymentMapper::toDto);
     }
 

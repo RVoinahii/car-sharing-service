@@ -5,7 +5,6 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,7 +27,6 @@ public class GetRentalMessageTemplateBuilder extends BaseRentalMessageBuilder<Re
 
         boolean isReturned = actualReturn != null;
         boolean isLate = isReturned && actualReturn.isAfter(expectedReturn);
-        long delayDays = isLate ? ChronoUnit.DAYS.between(expectedReturn, actualReturn) : 0;
 
         return switch (recipient) {
             case RECIPIENT_CUSTOMER -> String.format("""

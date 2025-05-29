@@ -3,6 +3,7 @@ package com.carshare.rentalsystem.controller;
 import static com.carshare.rentalsystem.controller.RentalController.AUTHORITY_MANAGER;
 
 import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
+import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
@@ -39,14 +40,16 @@ public class PaymentController {
                     + " their own payments. Managers can view all rentals and filter them using"
                     + " 'user ID' parameter. (Required roles: CUSTOMER, MANAGER)"
     )
-    public Page<PaymentResponseDto> getAllPayments(
-            @RequestParam(required = false) Long userId, Authentication authentication,
-            Pageable pageable) {
-        boolean isAdmin = authentication.getAuthorities().stream()
+    public Page<PaymentResponseDto> getAllPayments(Authentication authentication,
+            PaymentSearchParameters searchParameters, Pageable pageable) {
+        boolean isManager = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
 
-        Long effectiveUserId = isAdmin ? userId : getAuthenticatedUserId(authentication);
-        return paymentService.getAllPayments(effectiveUserId, pageable);
+        if (isManager) {
+            return paymentService.getSpecificPayments(searchParameters, pageable);
+        }
+
+        return paymentService.getPaymentsById(getAuthenticatedUserId(authentication), pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
