@@ -21,6 +21,9 @@ public interface PaymentMapper {
 
     PaymentCancelResponseDto toCancelDto(Payment payment);
 
+    @Mapping(target = "status", source = "status", qualifiedByName = "mapPaymentStatus")
+    @Mapping(target = "userId", source = "rental.user.id")
+    @Mapping(target = "rentalId", source = "rental.id")
     PaymentPreviewResponseDto toPreviewDto(Payment payment);
 
     @Named("mapPaymentStatus")

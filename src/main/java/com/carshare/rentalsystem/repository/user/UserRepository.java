@@ -9,9 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.email = :email")
-    Optional<User> findByEmailWithRole(@Param("email") String email);
-
-    @Query("SELECT u FROM User u JOIN FETCH u.role WHERE u.id = :userId")
-    Optional<User> findByIdWithRole(@Param("userId") Long userId);
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    Optional<User> findByEmail(@Param("email") String email);
 }

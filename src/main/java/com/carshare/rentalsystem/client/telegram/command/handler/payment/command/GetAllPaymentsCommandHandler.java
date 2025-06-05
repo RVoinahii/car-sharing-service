@@ -13,7 +13,7 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipie
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
-import com.carshare.rentalsystem.dto.payment.response.dto.PaymentResponseDto;
+import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.model.User;
@@ -66,7 +66,7 @@ public class GetAllPaymentsCommandHandler implements TelegramCommandHandler {
             return;
         }
 
-        Page<PaymentResponseDto> page;
+        Page<PaymentPreviewResponseDto> page;
         PaymentSearchParameters searchParameters = null;
 
         if (user.isManager()) {
@@ -76,7 +76,7 @@ public class GetAllPaymentsCommandHandler implements TelegramCommandHandler {
                     PageRequest.of(START_PAGE_INDEX, PAGE_SIZE)
             );
         } else {
-            page = stripePaymentService.getPaymentsById(
+            page = stripePaymentService.getPaymentsByUserId(
                     telegramUserLink.getUserId(),
                     PageRequest.of(START_PAGE_INDEX, PAGE_SIZE)
             );

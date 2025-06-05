@@ -23,11 +23,16 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>,
     @Query("SELECT p FROM Payment p WHERE p.sessionId = :sessionId")
     Optional<Payment> findBySessionId(@Param("sessionId") String sessionId);
 
-    @Query("SELECT p FROM Payment p WHERE p.rental.user.id = :userId")
+    @Query("""
+    SELECT p FROM Payment p
+    JOIN FETCH p.rental r
+    JOIN FETCH r.user
+    WHERE r.user.id = :userId
+            """)
     Page<Payment> findAllByRentalUserId(@Param("userId") Long userId,
                                                          Pageable pageable);
 
-    @EntityGraph(attributePaths = {"rental", "rental.user", "rental.car"})
+    @EntityGraph(attributePaths = {"rental", "rental.user"})
     Page<Payment> findAll(Specification<Payment> spec, Pageable pageable);
 
     @Query("""

@@ -133,6 +133,12 @@
 			<artifactId>java-telegram-bot-api</artifactId>
 			<version>8.3.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.29.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

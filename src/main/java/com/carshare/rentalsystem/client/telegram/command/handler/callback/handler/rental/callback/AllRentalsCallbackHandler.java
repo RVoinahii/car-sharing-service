@@ -11,7 +11,7 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipie
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.model.User;
@@ -31,11 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AllRentalsCallbackHandler implements TelegramCallbackHandler {
     public static final String PAGE_SPLIT_DELIMITER = ":";
-    public static final int PAGE_NUMBER_PART = 1;
     public static final int FIRST_PAGE_INDEX = 0;
-
-    private static final int USER_ID_PART = 2;
-    private static final int STATUS_PART = 3;
 
     private final RentalService rentalService;
     private final ActiveTelegramUserStorage telegramUserStorage;
@@ -73,7 +69,7 @@ public class AllRentalsCallbackHandler implements TelegramCallbackHandler {
         String[] dataParts = callbackData.split(PAGE_SPLIT_DELIMITER);
         int pageNumber = parsePageNumber(dataParts);
 
-        Page<RentalResponseDto> page;
+        Page<RentalPreviewResponseDto> page;
         RentalSearchParameters searchParameters = null;
 
         if (user.isManager()) {

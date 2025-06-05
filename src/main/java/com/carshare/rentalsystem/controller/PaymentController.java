@@ -2,7 +2,6 @@ package com.carshare.rentalsystem.controller;
 
 import static com.carshare.rentalsystem.controller.RentalController.AUTHORITY_MANAGER;
 
-import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
 import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +38,7 @@ public class PaymentController {
                     + " their own payments. Managers can view all rentals and filter them using"
                     + " 'user ID' parameter. (Required roles: CUSTOMER, MANAGER)"
     )
-    public Page<PaymentResponseDto> getAllPayments(Authentication authentication,
+    public Page<PaymentPreviewResponseDto> getAllPayments(Authentication authentication,
             PaymentSearchParameters searchParameters, Pageable pageable) {
         boolean isManager = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
@@ -49,7 +47,7 @@ public class PaymentController {
             return paymentService.getSpecificPayments(searchParameters, pageable);
         }
 
-        return paymentService.getPaymentsById(getAuthenticatedUserId(authentication), pageable);
+        return paymentService.getPaymentsByUserId(getAuthenticatedUserId(authentication), pageable);
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
@@ -96,15 +94,15 @@ public class PaymentController {
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
-    @PostMapping
+    @PostMapping("/{rentalId}")
     @Operation(
             summary = "Create a new Stripe payment session",
             description = "Creates a Stripe session for the specified rental and payment type."
                     + "  The session is valid for 24 hours. (Required roles: CUSTOMER, MANAGER)"
     )
-    public PaymentPreviewResponseDto createPaymentSession(
-            @RequestBody CreatePaymentRequestDto requestDto, Authentication authentication) {
-        return paymentService.createStripeSession(requestDto,
+    public PaymentResponseDto createPaymentSession(
+            @PathVariable Long rentalId, Authentication authentication) {
+        return paymentService.createStripeSession(rentalId,
                 getAuthenticatedUserId(authentication));
     }
 
@@ -116,7 +114,7 @@ public class PaymentController {
                     + "  allowed for payments with EXPIRED status."
                     + " (Required roles: CUSTOMER, MANAGER)"
     )
-    public PaymentPreviewResponseDto renewPayment(@PathVariable Long paymentId,
+    public PaymentResponseDto renewPayment(@PathVariable Long paymentId,
                                                   Authentication authentication) {
         return paymentService.renewStripeSession(getAuthenticatedUserId(authentication),
                 paymentId);

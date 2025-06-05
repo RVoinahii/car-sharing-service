@@ -8,9 +8,12 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableSpringDataWebSupport(
+        pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 @EnableAsync
 @EnableScheduling
 @RequiredArgsConstructor
@@ -18,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @OpenAPIDefinition(
         info = @Info(
                 title = "Car Sharing Service",
-                version = "0.1.0",
+                version = "0.7.5",
                 description = """
                         A feature-rich Car Sharing System built with Spring Boot, offering
                         a modern platform for managing vehicles, rentals, users, and payments.

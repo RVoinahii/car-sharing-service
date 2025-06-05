@@ -17,7 +17,7 @@ public class TelegramLinkService {
 
     @Transactional
     public TelegramUserLink linkUser(Long userId, Long chatId) {
-        User user = userRepository.findByIdWithRole(userId).orElseThrow(
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find user.")
         );
         TelegramUserLink telegramUserLink = new TelegramUserLink(user, chatId);

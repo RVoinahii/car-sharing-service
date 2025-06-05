@@ -1,5 +1,8 @@
 package com.carshare.rentalsystem.util;
 
+import com.carshare.rentalsystem.exception.CipherInitializationException;
+import com.carshare.rentalsystem.exception.DecryptionException;
+import com.carshare.rentalsystem.exception.EncryptionException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
@@ -18,8 +21,9 @@ public class AesEncryptionUtil {
             byte[] encrypted = cipher.doFinal(data.getBytes());
             return Base64.getUrlEncoder().withoutPadding().encodeToString(encrypted);
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException("AES Encryption failed. Ensure correct key/IV"
-                    + " and algorithm.", e);
+            throw new EncryptionException(
+                    "Encryption failed: unable to process data with provided AES key and IV."
+            );
         }
     }
 
@@ -30,8 +34,8 @@ public class AesEncryptionUtil {
             byte[] original = cipher.doFinal(Base64.getUrlDecoder().decode(encrypted));
             return new String(original);
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException("AES Decryption failed. Ensure valid ciphertext,"
-                    + " key/IV, and algorithm.", e);
+            throw new DecryptionException(
+                    "Decryption failed: invalid ciphertext or mismatched AES configuration.");
         }
     }
 
@@ -43,8 +47,8 @@ public class AesEncryptionUtil {
             cipher.init(mode, keySpec, ivSpec);
             return cipher;
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException("Failed to initialize AES cipher. Check"
-                    + " key, IV, and algorithm.", e);
+            throw new CipherInitializationException("Cipher initialization failed: check"
+                    + " AES key, IV, and algorithm configuration.");
         }
     }
 }

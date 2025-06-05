@@ -2,9 +2,11 @@ package com.carshare.rentalsystem.controller;
 
 import com.carshare.rentalsystem.dto.rental.request.dto.CreateRentalRequestDto;
 import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 import com.carshare.rentalsystem.model.User;
 import com.carshare.rentalsystem.service.rental.RentalService;
+import com.carshare.rentalsystem.service.review.rental.RentalReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,6 +30,7 @@ public class RentalController {
     public static final String AUTHORITY_MANAGER = "MANAGER";
 
     private final RentalService rentalService;
+    private final RentalReviewService rentalReviewService;
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @GetMapping
@@ -37,7 +40,7 @@ public class RentalController {
                     + " their own rentals. Managers can view all rentals and filter them using"
                     + " parameters such as activity status. (Required roles: CUSTOMER, MANAGER)"
     )
-    public Page<RentalResponseDto> getAllRentals(Authentication authentication,
+    public Page<RentalPreviewResponseDto> getAllRentals(Authentication authentication,
             RentalSearchParameters searchParameters, Pageable pageable) {
         boolean isManager = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(AUTHORITY_MANAGER));
@@ -84,7 +87,7 @@ public class RentalController {
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
-    @PostMapping("/{rentId}/returns")
+    @PostMapping(value = "/{rentId}/returns")
     @Operation(
             summary = "Return a rented car",
             description = "Marks a rental as returned by setting the actual return date to the"

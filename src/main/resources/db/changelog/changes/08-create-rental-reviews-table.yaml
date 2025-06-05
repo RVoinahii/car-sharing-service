@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rental-reviews-table
+      author: romanvoinahii
+      changes:
+        - createTable:
+            tableName: rental_reviews
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rental_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: overall_impression
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: varchar(1000)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: rental_reviews
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_rental_reviews_user
+        - addForeignKeyConstraint:
+            baseTableName: rental_reviews
+            baseColumnNames: rental_id
+            referencedTableName: rentals
+            referencedColumnNames: id
+            constraintName: fk_rental_reviews_rental
