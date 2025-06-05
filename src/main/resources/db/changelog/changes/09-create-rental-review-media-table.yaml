@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-rental-review-media-table
+      author: romanvoinahii
+      changes:
+        - createTable:
+            tableName: rental_review_media
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rental_review_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: s3_key
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: media_type
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: rental_review_media
+            baseColumnNames: rental_review_id
+            referencedTableName: rental_reviews
+            referencedColumnNames: id
+            constraintName: fk_rental_review_media_rental_review

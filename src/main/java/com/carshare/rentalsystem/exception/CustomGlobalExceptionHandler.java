@@ -38,10 +38,34 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(CipherInitializationException.class)
+    public ResponseEntity<Map<String, Object>> handleCipherInitializationExceptions(
+            CipherInitializationException exception) {
+        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DecryptionException.class)
+    public ResponseEntity<Map<String, Object>> handleDecryptionExceptions(
+            DecryptionException exception) {
+        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateReviewExceptions(
+            DuplicateReviewException exception) {
+        return buildErrorResponse(exception, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleEmailAlreadyExistsExceptions(
             EmailAlreadyExistsException exception) {
         return buildErrorResponse(exception, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(EncryptionException.class)
+    public ResponseEntity<Map<String, Object>> handleEncryptionExceptions(
+            EncryptionException exception) {
+        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -50,10 +74,22 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidMediaFileException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidMediaFileExceptions(
+            InvalidMediaFileException exception) {
+        return buildErrorResponse(exception, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+
     @ExceptionHandler(InvalidPaymentTypeException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidPaymentTypeExceptions(
             InvalidPaymentTypeException exception) {
         return buildErrorResponse(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxActiveRentalsExceededException.class)
+    public ResponseEntity<Map<String, Object>> handleMaxActiveRentalsExceededExceptions(
+            MaxActiveRentalsExceededException exception) {
+        return buildErrorResponse(exception, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(PaymentNotExpiredException.class)
@@ -68,6 +104,12 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(RentalAccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleRentalAccessDeniedExceptions(
+            RentalAccessDeniedException exception) {
+        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(RentalAlreadyReturnedException.class)
     public ResponseEntity<Map<String, Object>> handleRentalAlreadyReturnedExceptions(
             RentalAlreadyReturnedException exception) {
@@ -80,6 +122,24 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(ReviewAccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleReviewAccessDeniedExceptions(
+            ReviewAccessDeniedException exception) {
+        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(S3DeleteException.class)
+    public ResponseEntity<Map<String, Object>> handleS3DeleteExceptions(
+            S3DeleteException exception) {
+        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(S3UploadException.class)
+    public ResponseEntity<Map<String, Object>> handleS3UploadExceptions(
+            S3UploadException exception) {
+        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(SpecificationNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleSpecificationNotFoundExceptions(
             SpecificationNotFoundException exception) {
@@ -90,6 +150,18 @@ public class CustomGlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleStripeSessionCreationExceptions(
             StripeSessionCreationException exception) {
         return buildErrorResponse(exception, HttpStatus.BAD_GATEWAY);
+    }
+
+    @ExceptionHandler(TooLargeMediaFileException.class)
+    public ResponseEntity<Map<String, Object>> handleTooLargeMediaFileExceptions(
+            TooLargeMediaFileException exception) {
+        return buildErrorResponse(exception, HttpStatus.PAYLOAD_TOO_LARGE);
+    }
+
+    @ExceptionHandler(TooLateToCancelRentalException.class)
+    public ResponseEntity<Map<String, Object>> handleTooLateToCancelRentalExceptions(
+            TooLateToCancelRentalException exception) {
+        return buildErrorResponse(exception, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

@@ -13,3 +13,7 @@ databaseChangeLog:
       file: db/changelog/changes/06-insert-roles-into-roles-table.yaml
   - include:
       file: db/changelog/changes/07-create-telegram-user-links-table.yaml
+  - include:
+      file: db/changelog/changes/08-create-rental-reviews-table.yaml
+  - include:
+      file: db/changelog/changes/09-create-rental-review-media-table.yaml

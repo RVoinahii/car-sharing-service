@@ -1,5 +1,7 @@
 package com.carshare.rentalsystem.controller;
 
+import com.carshare.rentalsystem.client.telegram.TelegramAuthenticationService;
+import com.carshare.rentalsystem.dto.telegram.TelegramTokenResponseDto;
 import com.carshare.rentalsystem.dto.user.request.dto.UpdateUserRoleRequestDto;
 import com.carshare.rentalsystem.dto.user.request.dto.UserUpdateRequestDto;
 import com.carshare.rentalsystem.dto.user.response.dto.UserResponseDto;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final TelegramAuthenticationService telegramAuthenticationService;
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @GetMapping("/me")
@@ -35,6 +38,13 @@ public class UserController {
     )
     public UserResponseDto getProfileInfo(Authentication authentication) {
         return userService.getUserInfo(getAuthenticatedUserId(authentication));
+    }
+
+    @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
+    @GetMapping("/telegram")
+    public TelegramTokenResponseDto loginToTelegram(Authentication authentication) {
+        return telegramAuthenticationService.getTelegramLink(
+                getAuthenticatedUserId(authentication));
     }
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")

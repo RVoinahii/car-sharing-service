@@ -9,7 +9,7 @@ import com.carshare.rentalsystem.client.telegram.message.template.MessageRecipie
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateDispatcher;
 import com.carshare.rentalsystem.client.telegram.message.template.MessageType;
 import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
-import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.TelegramUserLink;
 import com.carshare.rentalsystem.model.User;
@@ -66,7 +66,7 @@ public class GetAllRentalsCommandHandler implements TelegramCommandHandler {
             return;
         }
 
-        Page<RentalResponseDto> page;
+        Page<RentalPreviewResponseDto> page;
         RentalSearchParameters searchParameters = null;
 
         if (user.isManager()) {

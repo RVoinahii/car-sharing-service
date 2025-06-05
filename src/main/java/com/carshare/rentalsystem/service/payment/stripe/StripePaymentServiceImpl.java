@@ -3,7 +3,6 @@ package com.carshare.rentalsystem.service.payment.stripe;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentCancelEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.PaymentSuccessEventDto;
 import com.carshare.rentalsystem.dto.payment.even.dto.RenewPaymentEvenDto;
-import com.carshare.rentalsystem.dto.payment.request.dto.CreatePaymentRequestDto;
 import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentCancelResponseDto;
 import com.carshare.rentalsystem.dto.payment.response.dto.PaymentPreviewResponseDto;
@@ -51,19 +50,20 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<PaymentResponseDto> getPaymentsById(Long userId, Pageable pageable) {
-        return paymentRepository.findAllByRentalUserId(userId, pageable).map(paymentMapper::toDto);
+    public Page<PaymentPreviewResponseDto> getPaymentsByUserId(Long userId, Pageable pageable) {
+        return paymentRepository.findAllByRentalUserId(userId, pageable)
+                .map(paymentMapper::toPreviewDto);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<PaymentResponseDto> getSpecificPayments(PaymentSearchParameters searchParameters,
-                                                        Pageable pageable) {
+    public Page<PaymentPreviewResponseDto> getSpecificPayments(
+            PaymentSearchParameters searchParameters, Pageable pageable) {
         Specification<Payment> paymentSpecification =
                 paymentSpecificationBuilder.build(searchParameters);
 
         return paymentRepository.findAll(paymentSpecification, pageable)
-                .map(paymentMapper::toDto);
+                .map(paymentMapper::toPreviewDto);
     }
 
     @Transactional(readOnly = true)
@@ -88,19 +88,21 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     @Transactional
     @Override
-    public PaymentPreviewResponseDto createStripeSession(CreatePaymentRequestDto requestDto,
-                                                         Long userId) {
+    public PaymentResponseDto createStripeSession(Long rentalId, Long userId) {
         if (hasPendingPaymentSession(userId)) {
-            throw new ActiveSessionAlreadyExistsException("User already has an active session!");
+            throw new ActiveSessionAlreadyExistsException(
+                    "An active payment session already exists. Please complete or"
+                            + " wait for it to expire before creating a new one."
+            );
         }
 
-        Rental rental = rentalRepository.findByIdAndUserIdWithCarAndUser(
-                requestDto.rentalId(), userId)
+        Rental rental = rentalRepository.findByIdAndUserIdWithCarAndUser(rentalId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find rental with id: "
-                        + requestDto.rentalId()));
+                        + rentalId));
 
         if (rental.getStatus() != Rental.RentalStatus.WAITING_FOR_PAYMENT) {
-            throw new RentalNotFinishedException("Can't create payment for this rental.");
+            throw new RentalNotFinishedException(
+                    "Payment can only be created for rentals that are waiting for payment.");
         }
 
         RentalPaymentCalculator.PaymentCalculationResult calculationResult =
@@ -118,18 +120,19 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                 calculationResult.amount()
         );
 
-        return paymentMapper.toPreviewDto(paymentRepository.save(payment));
+        return paymentMapper.toDto(paymentRepository.save(payment));
     }
 
     @Transactional
     @Override
-    public PaymentPreviewResponseDto renewStripeSession(Long userId, Long paymentId) {
+    public PaymentResponseDto renewStripeSession(Long userId, Long paymentId) {
         Payment payment = paymentRepository.findByIdAndRentalUserId(paymentId, userId).orElseThrow(
                 () -> new EntityNotFoundException("Payment not found.")
         );
 
         if (payment.getStatus() != Payment.PaymentStatus.EXPIRED) {
-            throw new PaymentNotExpiredException("Only expired payments can be renewed.");
+            throw new PaymentNotExpiredException(
+                    "Only payments with status EXPIRED can be renewed.");
         }
 
         PaymentSession session = paymentProvider.createSession(RENTAL_PAYMENT_DESCRIPTION
@@ -141,18 +144,19 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         payment.setCreatedAt(LocalDateTime.now());
         payment.setExpiredAt(LocalDateTime.now().plusHours(PAYMENT_SESSION_EXPIRATION_HOURS));
 
-        PaymentResponseDto responseDto = paymentMapper.toDto(payment);
+        PaymentResponseDto responseDto = paymentMapper.toDto(paymentRepository.save(payment));
 
         applicationEventPublisher.publishEvent(new RenewPaymentEvenDto(responseDto, userId));
 
-        return paymentMapper.toPreviewDto(paymentRepository.save(payment));
+        return responseDto;
     }
 
     @Transactional
     @Override
     public PaymentResponseDto handleSuccess(String sessionId) {
         Payment payment = paymentRepository.findBySessionIdWithRental(sessionId).orElseThrow(
-                () -> new EntityNotFoundException("Payment not found.")
+                () -> new EntityNotFoundException("Payment with session id '"
+                        + sessionId + "' not found.")
         );
 
         resolveRentalStatus(payment.getRental());
@@ -171,7 +175,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Override
     public PaymentCancelResponseDto handleCancel(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
-                () -> new EntityNotFoundException("Payment not found.")
+                () -> new EntityNotFoundException("Payment with session id '"
+                        + sessionId + "' not found.")
         );
         PaymentCancelResponseDto responseDto = paymentMapper.toCancelDto(payment);
         PaymentResponseDto responseDto1 = paymentMapper.toDto(payment);

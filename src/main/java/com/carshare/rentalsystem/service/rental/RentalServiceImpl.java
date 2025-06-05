@@ -7,11 +7,14 @@ import com.carshare.rentalsystem.dto.rental.event.dto.RentalCreatedEventDto;
 import com.carshare.rentalsystem.dto.rental.event.dto.RentalReturnEventDto;
 import com.carshare.rentalsystem.dto.rental.request.dto.CreateRentalRequestDto;
 import com.carshare.rentalsystem.dto.rental.request.dto.RentalSearchParameters;
+import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDto;
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
-import com.carshare.rentalsystem.exception.AccessDeniedException;
 import com.carshare.rentalsystem.exception.CarNotAvailableException;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
+import com.carshare.rentalsystem.exception.MaxActiveRentalsExceededException;
+import com.carshare.rentalsystem.exception.RentalAccessDeniedException;
 import com.carshare.rentalsystem.exception.RentalAlreadyReturnedException;
+import com.carshare.rentalsystem.exception.TooLateToCancelRentalException;
 import com.carshare.rentalsystem.mapper.RentalMapper;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
@@ -57,8 +60,8 @@ public class RentalServiceImpl implements RentalService {
                         Rental.RentalStatus.ACTIVE));
 
         if (activeRentals >= MAX_ACTIVE_RENTALS) {
-            throw new IllegalStateException("User already has " + activeRentals
-                    + " active rentals");
+            throw new MaxActiveRentalsExceededException("User already has " + activeRentals
+                    + " active rentals. Maximum allowed: " + MAX_ACTIVE_RENTALS);
         }
 
         Car car = updateCarInventory(requestDto.getCarId(), DECREASE_CAR_INVENTORY);
@@ -84,20 +87,20 @@ public class RentalServiceImpl implements RentalService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<RentalResponseDto> getRentalsById(Long userId, Pageable pageable) {
+    public Page<RentalPreviewResponseDto> getRentalsById(Long userId, Pageable pageable) {
         return rentalRepository.findAllByUserIdWithCarAndUser(userId, pageable)
-                .map(rentalMapper::toDto);
+                .map(rentalMapper::toPreviewDto);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<RentalResponseDto> getSpecificRentals(
+    public Page<RentalPreviewResponseDto> getSpecificRentals(
             RentalSearchParameters searchParameters, Pageable pageable) {
         Specification<Rental> rentalSpecification =
                 rentalSpecificationBuilder.build(searchParameters);
 
         return rentalRepository.findAll(rentalSpecification, pageable)
-                .map(rentalMapper::toDto);
+                .map(rentalMapper::toPreviewDto);
     }
 
     @Transactional(readOnly = true)
@@ -126,7 +129,8 @@ public class RentalServiceImpl implements RentalService {
         Rental rental = findRentalById(rentalId);
 
         if (!rental.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("You are not allowed to return this rental");
+            throw new RentalAccessDeniedException(
+                    "You do not have permission to return this rental");
         }
 
         if (rental.getActualReturnDate() != null) {
@@ -138,8 +142,9 @@ public class RentalServiceImpl implements RentalService {
 
         if (rental.getStatus() == Rental.RentalStatus.RESERVED
                 && !today.isBefore(rentalStartDate.minusDays(MAX_EARLY_CANCEL_DAYS))) {
-            throw new IllegalStateException("You can only cancel the rental max "
-                    + MAX_EARLY_CANCEL_DAYS + " days before the rental date");
+            throw new TooLateToCancelRentalException(
+                    "You can only cancel a reserved rental at least "
+                            + MAX_EARLY_CANCEL_DAYS + " days in advance");
         }
 
         rental.setActualReturnDate(today);
