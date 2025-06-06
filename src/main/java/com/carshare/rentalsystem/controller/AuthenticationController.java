@@ -15,7 +15,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Authentication management", description = "Endpoints for managing authentication")
+@Tag(
+        name = "Authentication management",
+        description = """
+        Endpoints for user registration and login.
+
+        - Register new users with required personal and credential information
+        - Authenticate existing users and return a JWT token for further access
+
+        These endpoints are public and do not require prior authentication.
+            """
+)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
@@ -25,8 +35,16 @@ public class AuthenticationController {
 
     @PostMapping("/registration")
     @Operation(
-            summary = "Create a new user",
-            description = "Create a new user with the provided parameters"
+            summary = "Register a new user account",
+            description = """
+        Creates a new user by providing:
+        - Valid email address
+        - Password (8–20 characters)
+        - Matching repeat password
+        - First and last name
+
+        Returns user details upon successful registration.
+            """
     )
     public UserResponseDto registerUser(
             @RequestBody @Valid UserRegistrationRequestDto userRequestDto) {
@@ -35,8 +53,11 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Operation(
-            summary = "Authenticate existing user",
-            description = "Authenticate existing user with the provided parameters"
+            summary = "Log in with existing user credentials",
+            description = """
+        Authenticates a user using their email and password.
+        Returns a JWT access token and basic user information if authentication succeeds.
+            """
     )
     public UserLoginResponseDto login(@RequestBody @Valid UserLoginRequestDto requestDto) {
         return authenticationService.authenticate(requestDto);

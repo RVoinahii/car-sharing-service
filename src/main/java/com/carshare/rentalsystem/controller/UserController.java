@@ -21,7 +21,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "User management", description = "Endpoints for managing users")
+@Tag(
+        name = "User management",
+        description = """
+        Endpoints for managing user accounts and profiles.
+
+        - **Customers and Managers** can:
+          - View and update their own profile
+          - Link their Telegram account via a secure temporary link
+        - **Managers** can:
+          - Promote or demote other users by changing their roles (e.g. CUSTOMER ↔ MANAGER)
+
+        Email uniqueness and security are enforced during updates and role changes.
+            """
+)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -32,9 +45,13 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @GetMapping("/me")
     @Operation(
-            summary = "Get current user profile info",
-            description = "Retrieve the profile information of the currently authenticated user."
-                    + "(Required roles: CUSTOMER, MANAGER)"
+            summary = "Get current user profile",
+            description = """
+        Returns the profile information of the currently authenticated user, including ID, email,
+        full name, and role.
+        
+        **Required roles:** CUSTOMER, MANAGER
+            """
     )
     public UserResponseDto getProfileInfo(Authentication authentication) {
         return userService.getUserInfo(getAuthenticatedUserId(authentication));
@@ -42,6 +59,15 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @GetMapping("/telegram")
+    @Operation(
+            summary = "Generate Telegram authentication link",
+            description = """
+        Generates a one-time Telegram authentication link (valid for 10 minutes) for the currently
+        authenticated user. Used to securely link the user's Telegram account.
+        
+        **Required roles:** CUSTOMER, MANAGER
+            """
+    )
     public TelegramTokenResponseDto loginToTelegram(Authentication authentication) {
         return telegramAuthenticationService.getTelegramLink(
                 getAuthenticatedUserId(authentication));
@@ -50,10 +76,15 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @PatchMapping("/me")
     @Operation(
-            summary = "Update current user profile info",
-            description = "Update the profile information of the currently authenticated user, "
-                    + "such as first name, last name and email."
-                    + "(Required roles: CUSTOMER, MANAGER)"
+            summary = "Update user profile",
+            description = """
+        Updates the currently authenticated user's profile details (first name, last name,
+        and/or email).
+        
+        Email must be unique in the system. Only non-null fields in the request will be updated.
+        
+        **Required roles:** CUSTOMER, MANAGER
+            """
     )
     public UserResponseDto updateProfileInfo(Authentication authentication,
             @RequestBody @Valid UserUpdateRequestDto updateRequestDto) {
@@ -63,9 +94,12 @@ public class UserController {
     @PreAuthorize("hasAuthority('MANAGER')")
     @PutMapping("/{userId}/role")
     @Operation(
-            summary = "Update user's role by user ID",
-            description = "Update the role of a user by the given user ID."
-                    + "(Required roles: MANAGER)"
+            summary = "Change user role by ID",
+            description = """
+        Updates the role of a user by their user ID. Allowed roles: CUSTOMER, MANAGER.
+        
+        **Required roles:** MANAGER
+            """
     )
     public UserResponseDto updateUserRole(@PathVariable Long userId,
             @RequestBody @Valid UpdateUserRoleRequestDto updateRequestDto) {

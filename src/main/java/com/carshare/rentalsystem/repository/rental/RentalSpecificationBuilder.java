@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RentalSpecificationBuilder implements SpecificationBuilder<Rental,
         RentalSearchParameters> {
-    public static final String USER_ID = "userId";
-    public static final String RENTAL_STATUS = "status";
+    public static final String FIELD_USER_ID = "userId";
+    public static final String FIELD_RENTAL_STATUS = "status";
 
     private final SpecificationProviderManager<Rental> rentalSpecificationProviderManager;
 
@@ -22,14 +22,14 @@ public class RentalSpecificationBuilder implements SpecificationBuilder<Rental,
         Specification<Rental> spec = Specification.where(null);
         if (searchParameters.userId() != null && !searchParameters.userId().isEmpty()) {
             spec = spec.and(rentalSpecificationProviderManager
-                    .getSpecificationProvider(USER_ID)
+                    .getSpecificationProvider(FIELD_USER_ID)
                     .getSpecification(searchParameters.userId()));
         }
 
         if (searchParameters.status() != null) {
             String value = searchParameters.status().name();
             spec = spec.and(rentalSpecificationProviderManager
-                    .getSpecificationProvider(RENTAL_STATUS)
+                    .getSpecificationProvider(FIELD_RENTAL_STATUS)
                     .getSpecification(value));
         }
         return spec;

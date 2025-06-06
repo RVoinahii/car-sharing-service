@@ -42,15 +42,15 @@ public class GetRentalCommandHandler implements TelegramCommandHandler {
 
         if (telegramUserLink == null) {
             bot.execute(new SendMessage(chatId,
-                    "❗ Your Telegram account is not linked to any user in the system. "
-                            + "Please register or contact support."));
+                    "⚠️ Your Telegram account is not linked to any user in our system "
+                            + "Please register on our website."));
             return;
         }
 
         String[] parts = text.trim().split(COMMAND_ARGUMENT_DELIMITER_REGEX);
         if (parts.length < MIN_COMMAND_PARTS) {
             bot.execute(new SendMessage(
-                    chatId, "❗ Please provide a rental ID. Example: /get_rental 123")
+                    chatId, "ℹ Please provide a rental ID to proceed. Example: /get_rental 123")
             );
             return;
         }
@@ -60,14 +60,16 @@ public class GetRentalCommandHandler implements TelegramCommandHandler {
         try {
             rentalId = Long.parseLong(parts[DATA_ID_INDEX]);
         } catch (NumberFormatException e) {
-            bot.execute(new SendMessage(chatId, "❗️ Invalid rental ID. It must be a number."));
+            bot.execute(new SendMessage(chatId, "❗Invalid rental ID format. "
+                    + "The ID must be a number."));
             return;
         }
 
         User user = telegramUserLink.getUser();
 
         try {
-            MessageRecipient recipient = user.isManager() ? MessageRecipient.RECIPIENT_MANAGER
+            MessageRecipient recipient = user.isManager()
+                    ? MessageRecipient.RECIPIENT_MANAGER
                     : MessageRecipient.RECIPIENT_CUSTOMER;
 
             RentalResponseDto responseDto = getResponseDtoForUser(
@@ -82,7 +84,8 @@ public class GetRentalCommandHandler implements TelegramCommandHandler {
 
             bot.execute(new SendMessage(chatId, responseMessage));
         } catch (EntityNotFoundException e) {
-            bot.execute(new SendMessage(chatId, "❗️ Can't find rental with that id"));
+            bot.execute(new SendMessage(chatId, "❗️ No rental found with the provided ID."
+                    + " Please double-check and try again"));
         }
     }
 

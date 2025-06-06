@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReviewSpecificationBuilder implements SpecificationBuilder<RentalReview,
         ReviewSearchParameters> {
-    public static final String CAR_ID = "carId";
-    public static final String CAR_MODEL = "model";
-    public static final String CAR_BRAND = "brand";
-    public static final String CAR_TYPE = "type";
+    public static final String FIELD_CAR_ID = "carId";
+    public static final String FIELD_CAR_MODEL = "model";
+    public static final String FIELD_CAR_BRAND = "brand";
+    public static final String FIELD_CAR_TYPE = "type";
 
     private final SpecificationProviderManager<RentalReview> reviewSpecificationProviderManager;
 
@@ -24,26 +24,26 @@ public class ReviewSpecificationBuilder implements SpecificationBuilder<RentalRe
         Specification<RentalReview> spec = Specification.where(null);
         if (searchParameters.carId() != null && !searchParameters.carId().isEmpty()) {
             spec = spec.and(reviewSpecificationProviderManager
-                    .getSpecificationProvider(CAR_ID)
+                    .getSpecificationProvider(FIELD_CAR_ID)
                     .getSpecification(searchParameters.carId()));
         }
 
         if (searchParameters.model() != null && !searchParameters.model().isEmpty()) {
             spec = spec.and(reviewSpecificationProviderManager
-                    .getSpecificationProvider(CAR_MODEL)
+                    .getSpecificationProvider(FIELD_CAR_MODEL)
                     .getSpecification(searchParameters.model()));
         }
 
         if (searchParameters.brand() != null && !searchParameters.brand().isEmpty()) {
             spec = spec.and(reviewSpecificationProviderManager
-                    .getSpecificationProvider(CAR_BRAND)
+                    .getSpecificationProvider(FIELD_CAR_BRAND)
                     .getSpecification(searchParameters.brand()));
         }
 
         if (searchParameters.type() != null) {
             String value = searchParameters.type().name();
             spec = spec.and(reviewSpecificationProviderManager
-                    .getSpecificationProvider(CAR_TYPE)
+                    .getSpecificationProvider(FIELD_CAR_TYPE)
                     .getSpecification(value));
         }
         return spec;

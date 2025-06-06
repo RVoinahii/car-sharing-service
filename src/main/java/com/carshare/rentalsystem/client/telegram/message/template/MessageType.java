@@ -3,7 +3,8 @@ package com.carshare.rentalsystem.client.telegram.message.template;
 import com.carshare.rentalsystem.service.notifications.NotificationType;
 
 public enum MessageType {
-    AUTH_LINK_MSG,
+    COMMON_AUTH_LINK_MSG,
+    COMMON_HELP_MSG,
     RENTAL_INFO_MSG,
     RENTAL_LIST_MSG,
     RENTAL_NEW_MSG,

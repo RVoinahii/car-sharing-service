@@ -32,7 +32,13 @@ public class S3StorageServiceImpl implements S3StorageService {
             "video/mp4"
     );
 
-    private static final long MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+    private static final long ONE_MEGABYTE = 1024 * 1024;
+    private static final long MAX_FILE_SIZE_BYTES = 50 * ONE_MEGABYTE;
+    private static final String EXTENSION_SEPARATOR = ".";
+    private static final String DEFAULT_FILE_EXTENSION = "bin";
+    private static final String S3_KEY_PREFIX = "returns/";
+    private static final String S3_KEY_SEPARATOR = "/";
+    private static final Duration PRESIGNED_URL_DURATION = Duration.ofMinutes(10);
 
     private final AwsS3ClientProvider s3ClientProvider;
 
@@ -98,13 +104,14 @@ public class S3StorageServiceImpl implements S3StorageService {
 
     private String getFileExtension(String filename) {
         return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(f.lastIndexOf('.') + 1))
-                .orElse("bin");
+                .filter(f -> f.contains(EXTENSION_SEPARATOR))
+                .map(f -> f.substring(f.lastIndexOf(EXTENSION_SEPARATOR) + 1))
+                .orElse(DEFAULT_FILE_EXTENSION);
     }
 
     private String generateS3Key(Long rentId, String extension) {
-        return "returns/" + rentId + "/" + UUID.randomUUID() + "." + extension;
+        return S3_KEY_PREFIX + rentId + S3_KEY_SEPARATOR
+                + UUID.randomUUID() + EXTENSION_SEPARATOR + extension;
     }
 
     private void uploadToS3(String bucket, String key, MultipartFile file) {
@@ -133,7 +140,7 @@ public class S3StorageServiceImpl implements S3StorageService {
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .getObjectRequest(getObjectRequest)
-                .signatureDuration(Duration.ofMinutes(10))
+                .signatureDuration(PRESIGNED_URL_DURATION)
                 .build();
 
         return presigner.presignGetObject(presignRequest).url().toString();

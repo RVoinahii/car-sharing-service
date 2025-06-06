@@ -18,6 +18,7 @@ public class TelegramAuthenticationService {
     private static final String LINK_START = "start=";
 
     private final Map<String, Instant> validKeys = new ConcurrentHashMap<>();
+    private final AesEncryptionUtil aesEncryptionUtil;
 
     public TelegramTokenResponseDto getTelegramLink(Long userId) {
         String secretKey = generateSecretKey(userId);
@@ -51,6 +52,6 @@ public class TelegramAuthenticationService {
     }
 
     private String generateSecretKey(Long userId) {
-        return AesEncryptionUtil.encrypt(userId.toString());
+        return aesEncryptionUtil.encrypt(userId.toString());
     }
 }

@@ -10,6 +10,7 @@ public class PaginationKeyboardBuilder {
     private static final int PAGE_STEP = 1;
     private static final String PREVIOUS_BUTTON_TEXT = "⬅️ Previous";
     private static final String NEXT_BUTTON_TEXT = "➡️ Next";
+    private static final String CALLBACK_DATA_SEPARATOR = ":";
 
     public static InlineKeyboardMarkup create(int currentPage, int totalPages, String prefix,
                                               String... extraParams) {
@@ -33,7 +34,7 @@ public class PaginationKeyboardBuilder {
 
         for (String param : extraParams) {
             if (param != null && !param.isEmpty()) {
-                callbackData.append(":").append(param);
+                callbackData.append(CALLBACK_DATA_SEPARATOR).append(param);
             }
         }
 

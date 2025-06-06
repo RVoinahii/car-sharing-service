@@ -59,8 +59,8 @@ public class AllRentalsCallbackHandler implements TelegramCallbackHandler {
 
         if (telegramUserLink == null) {
             bot.execute(new AnswerCallbackQuery(callbackQuery.id())
-                    .text("❗ Your Telegram account is not linked to any user in the system. "
-                            + "Please register or contact support.")
+                    .text("⚠️ Your Telegram account is not linked to any user in our system "
+                            + "Please register on our website.")
                     .showAlert(true));
             return;
         }
