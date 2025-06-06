@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.repository.payment;
 
-import static com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder.USER_ID;
+import static com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder.FIELD_USER_ID;
 
 import com.carshare.rentalsystem.dto.payment.request.dto.PaymentSearchParameters;
 import com.carshare.rentalsystem.model.Payment;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentSpecificationBuilder implements SpecificationBuilder<Payment,
         PaymentSearchParameters> {
-    public static final String PAYMENT_STATUS = "status";
+    public static final String FIELD_PAYMENT_STATUS = "status";
 
     private final SpecificationProviderManager<Payment> paymentSpecificationProviderManager;
 
@@ -23,14 +23,14 @@ public class PaymentSpecificationBuilder implements SpecificationBuilder<Payment
         Specification<Payment> spec = Specification.where(null);
         if (searchParameters.userId() != null && !searchParameters.userId().isEmpty()) {
             spec = spec.and(paymentSpecificationProviderManager
-                    .getSpecificationProvider(USER_ID)
+                    .getSpecificationProvider(FIELD_USER_ID)
                     .getSpecification(searchParameters.userId()));
         }
 
         if (searchParameters.status() != null) {
             String value = searchParameters.status().name();
             spec = spec.and(paymentSpecificationProviderManager
-                    .getSpecificationProvider(PAYMENT_STATUS)
+                    .getSpecificationProvider(FIELD_PAYMENT_STATUS)
                     .getSpecification(value));
         }
         return spec;

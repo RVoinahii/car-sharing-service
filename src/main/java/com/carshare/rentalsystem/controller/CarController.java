@@ -25,7 +25,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Car management", description = "Endpoints for managing cars")
+@Tag(
+        name = "Car management",
+        description = """
+        Endpoints for viewing, creating, updating, and deleting car records.
+
+        - **Public access** to view available cars and their details
+        - **Manager-only** access to add new cars, update information or inventory, and
+         soft-delete cars
+
+        Supports pagination and sorting for car listings.
+            """
+)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/cars")
@@ -37,20 +48,30 @@ public class CarController {
 
     @GetMapping
     @Operation(
-            summary = "Get all cars",
-            description = "Get a paginated list of all available cars in the inventory "
-                    + "(No authentication required.)"
+            summary = "Retrieve all available cars",
+            description = """
+        Returns a paginated list of **all** available cars in the inventory.
+        Supports sorting by `model` and `brand`.
+        Each item includes: car ID, model, brand, type, and daily rental fee.
+        
+        **No authentication required.**
+            """
     )
     public Page<CarPreviewResponseDto> getAllCars(
             @ParameterObject @PageableDefault(sort = {MODEL, BRAND},
-            direction = Sort.Direction.ASC) Pageable pageable) {
+                    direction = Sort.Direction.ASC) Pageable pageable) {
         return carService.getAll(pageable);
     }
 
     @GetMapping("/{carId}")
     @Operation(
-            summary = "Get a car by ID",
-            description = "Get car by the given ID (No authentication required.)"
+            summary = "Get detailed car info by ID",
+            description = """
+        Retrieves detailed information for a specific car by ID.
+        Response includes: model, brand, type, inventory count, and daily rental fee.
+        
+        **No authentication required.**
+            """
     )
     public CarResponseDto getCarById(@PathVariable Long carId) {
         return carService.getById(carId);
@@ -59,8 +80,18 @@ public class CarController {
     @PreAuthorize("hasAuthority('MANAGER')")
     @PostMapping
     @Operation(
-            summary = "Create a new car",
-            description = "Create a new car with the provided parameters (Required roles: MANAGER)"
+            summary = "Create a new car entry",
+            description = """
+        Adds a new car to the inventory.
+        Required fields:
+        - Model (string)
+        - Brand (string)
+        - Type (enum: e.g., `SUV`, `SEDAN`, etc.)
+        - Inventory count (positive integer)
+        - Daily rental fee (positive decimal)
+        
+        **Required roles**: MANAGER
+            """
     )
     public CarResponseDto createCar(@RequestBody @Valid CreateCarRequestDto carDto) {
         return carService.create(carDto);
@@ -69,9 +100,13 @@ public class CarController {
     @PreAuthorize("hasAuthority('MANAGER')")
     @PatchMapping("/{carId}")
     @Operation(
-            summary = "Update car by ID",
-            description = "Update car by the given ID with the provided parameters "
-                    + "(Required roles: MANAGER)"
+            summary = "Update car details by ID",
+            description = """
+        Updates an existing car’s model, brand, type, inventory, or daily fee.
+        All fields are required (same as for car creation).
+        
+        **Required roles**: MANAGER
+            """
     )
     public CarResponseDto updateCar(@PathVariable Long carId,
             @RequestBody @Valid CreateCarRequestDto carDto) {
@@ -81,10 +116,13 @@ public class CarController {
     @PreAuthorize("hasAuthority('MANAGER')")
     @PutMapping("/{carId}")
     @Operation(
-            summary = "Update car inventory by car ID",
-            description = "Change th number of available cars in inventory by the given car"
-                    + "ID with the provided parameters "
-                    + "(Required roles: MANAGER)"
+            summary = "Update car inventory only",
+            description = """
+        Changes only the number of available cars in inventory for a given car ID.
+        Takes a single integer value (must be >= 0).
+        
+        **Required roles**: MANAGER
+            """
     )
     public CarResponseDto updateCarInventory(@PathVariable Long carId,
             @RequestBody @Valid InventoryUpdateRequestDto inventoryDto) {
@@ -95,8 +133,14 @@ public class CarController {
     @DeleteMapping("/{carId}")
     @Operation(
             summary = "Delete a car by ID",
-            description = "Mark a car as deleted by the given ID "
-                    + "(Required roles: MANAGER)"
+            description = """
+        Performs a **soft delete** of the specified car.
+          - The car is not physically removed from the database.
+          - Instead, it's marked as **inactive** and will no longer appear in active listings.
+          - This allows data retention and potential recovery.
+        
+        **Required roles**: MANAGER
+            """
     )
     public void deleteCar(@PathVariable Long carId) {
         carService.deleteById(carId);

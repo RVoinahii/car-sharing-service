@@ -23,7 +23,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Payments management", description = "Endpoints for managing payments")
+@Tag(
+        name = "Payments management",
+        description = """
+        Endpoints for handling rental payment workflows via Stripe.
+
+        - **Customers** can create payment sessions, view their own payments, and handle
+         payment results.
+        - **Managers** have full access to all payment records and can search by user or status.
+
+        Includes:
+        - Stripe session creation and renewal
+        - Payment success/cancellation handling
+        - Role-based access to payment data
+            """
+)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/payments")
@@ -34,9 +48,15 @@ public class PaymentController {
     @GetMapping
     @Operation(
             summary = "Retrieve payments",
-            description = "Returns a paginated list of payments records. Customers can only view"
-                    + " their own payments. Managers can view all rentals and filter them using"
-                    + " 'user ID' parameter. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Returns a paginated list of payment records.
+        
+        - Customers can only view **their own** payments.
+        - Managers can view **all** payments and filter them using optional search parameters
+        (e.g. `userId`, `status`).
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public Page<PaymentPreviewResponseDto> getAllPayments(Authentication authentication,
             PaymentSearchParameters searchParameters, Pageable pageable) {
@@ -54,9 +74,14 @@ public class PaymentController {
     @GetMapping("/{paymentId}")
     @Operation(
             summary = "Get payment details by ID",
-            description = "Returns detailed information about a specific payment by its ID."
-                    + "Customers can only access their own payments, while managers can access"
-                    + " any payment. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Returns full details of a specific payment by its ID.
+        
+        - Customers can access only their **own** payments.
+        - Managers can access **any** payment.
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public PaymentResponseDto getPaymentDetails(Authentication authentication,
                                                 @PathVariable Long paymentId) {
@@ -75,9 +100,17 @@ public class PaymentController {
     @GetMapping("/success")
     @Operation(
             summary = "Confirm payment success",
-            description = "Handles a successful Stripe session and marks the corresponding payment"
-                    + " as COMPLETED. Used internally by Stripe after user completes payment."
-                    + " (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Endpoint used internally by Stripe to confirm a **successful** payment session.
+        Automatically marks the associated payment as `COMPLETED` and updates the related
+         rental status if necessary.
+
+        This endpoint is triggered after the user finishes the Stripe checkout process.
+
+        ⚠️ Accessible via redirect from Stripe only.
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public PaymentResponseDto paymentSuccess(@RequestParam("session_id") String sessionId) {
         return paymentService.handleSuccess(sessionId);
@@ -86,8 +119,15 @@ public class PaymentController {
     @GetMapping("/cancel")
     @Operation(
             summary = "Handle cancelled payment",
-            description = "Returns information about a cancelled payment. Stripe redirects here"
-                    + "  when the user cancels the session. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Returns information about a payment that was **cancelled** via Stripe checkout.
+        
+        Does not modify the payment status unless explicitly processed on Stripe’s side.
+
+        ⚠️ Accessible via redirect from Stripe when a user **aborts** payment.
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public PaymentCancelResponseDto paymentCancel(@RequestParam("session_id") String sessionId) {
         return paymentService.handleCancel(sessionId);
@@ -97,8 +137,19 @@ public class PaymentController {
     @PostMapping("/{rentalId}")
     @Operation(
             summary = "Create a new Stripe payment session",
-            description = "Creates a Stripe session for the specified rental and payment type."
-                    + "  The session is valid for 24 hours. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Initiates a **Stripe Checkout Session** for the specified rental.
+
+        - The session remains valid for **24 hours**.
+        - Only one active session can exist per user at a time.
+        - The amount and session type are calculated dynamically depending on:
+          - rental cancellation,
+          - early return,
+          - late return,
+          - or standard completion.
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public PaymentResponseDto createPaymentSession(
             @PathVariable Long rentalId, Authentication authentication) {
@@ -110,9 +161,14 @@ public class PaymentController {
     @PatchMapping("/renew/{paymentId}")
     @Operation(
             summary = "Renew expired payment session",
-            description = "Creates a new Stripe session for an expired payment. Only"
-                    + "  allowed for payments with EXPIRED status."
-                    + " (Required roles: CUSTOMER, MANAGER)"
+            description = """
+        Creates a **new Stripe session** for a payment with status `EXPIRED`.
+
+        - Applicable only if the original session has expired (after 24h).
+        - The session is recreated with the same logic as initial creation.
+
+        **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public PaymentResponseDto renewPayment(@PathVariable Long paymentId,
                                                   Authentication authentication) {

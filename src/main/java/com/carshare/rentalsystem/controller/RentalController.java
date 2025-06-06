@@ -6,7 +6,6 @@ import com.carshare.rentalsystem.dto.rental.response.dto.RentalPreviewResponseDt
 import com.carshare.rentalsystem.dto.rental.response.dto.RentalResponseDto;
 import com.carshare.rentalsystem.model.User;
 import com.carshare.rentalsystem.service.rental.RentalService;
-import com.carshare.rentalsystem.service.review.rental.RentalReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,7 +21,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Rental management", description = "Endpoints for managing rentals")
+@Tag(
+        name = "Rental management",
+        description = """
+        Endpoints for managing the full rental lifecycle of cars.
+
+        - **Customers** can create rentals, return cars, and view their rental history.
+        - **Managers** can access and filter all rentals across users.
+
+        Business logic includes:
+        - Car inventory adjustments upon rental/return
+        - Status transitions (e.g. `RESERVED`, `ACTIVE`, `WAITING_FOR_PAYMENT`, `CANCELLED`)
+        - Rental restrictions (e.g. max active rentals per user, early cancellation rules)
+            """
+)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/rentals")
@@ -30,15 +42,19 @@ public class RentalController {
     public static final String AUTHORITY_MANAGER = "MANAGER";
 
     private final RentalService rentalService;
-    private final RentalReviewService rentalReviewService;
 
     @PreAuthorize("hasAnyAuthority('CUSTOMER', 'MANAGER')")
     @GetMapping
     @Operation(
             summary = "Retrieve rentals",
-            description = "Returns a paginated list of rental records. Customers can only view"
-                    + " their own rentals. Managers can view all rentals and filter them using"
-                    + " parameters such as activity status. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+                Returns a paginated list of rental records.
+                - Customers can view only their **own** rentals.
+                - Managers can view **all** rentals and filter them by parameters such as `userId`
+                and `status`.
+                
+                **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public Page<RentalPreviewResponseDto> getAllRentals(Authentication authentication,
             RentalSearchParameters searchParameters, Pageable pageable) {
@@ -56,9 +72,13 @@ public class RentalController {
     @GetMapping("/{rentalId}")
     @Operation(
             summary = "Get rental details by ID",
-            description = "Returns detailed information about a specific rental by its ID."
-                    + "Customers can only access their own rentals, while managers can access"
-                    + " any rental. (Required roles: CUSTOMER, MANAGER)"
+            description = """
+                Retrieves detailed information about a specific rental by its ID.
+                - Customers can access only their **own** rentals.
+                - Managers can access **any** rental.
+            
+                **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public RentalResponseDto getRentalDetails(Authentication authentication,
                                               @PathVariable Long rentalId) {
@@ -77,9 +97,19 @@ public class RentalController {
     @PostMapping
     @Operation(
             summary = "Create a new rental",
-            description = "Creates a new rental using the authenticated user's ID and the"
-                    + " provided rental parameters. Also decreases the inventory of the rented car"
-                    + " (Required roles: CUSTOMER, MANAGER)"
+            description = """
+                Creates a new rental for the authenticated user with the provided parameters.
+        
+                Business rules:
+                - Maximum rental duration is 14 days.
+                - If rentalDate is in the future, the rental status is set to RESERVED.
+                - If rentalDate is today or in the past, the rental status is set to ACTIVE.
+                - The inventory count of the rented car is decreased by one.
+                - A user can have at most 3 active rentals (statuses 'RESERVED',
+                 'WAITING_FOR_PAYMENT', 'ACTIVE').
+        
+                **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public RentalResponseDto rentCar(Authentication authentication,
                                      @RequestBody @Valid CreateRentalRequestDto requestDto) {
@@ -90,9 +120,20 @@ public class RentalController {
     @PostMapping(value = "/{rentId}/returns")
     @Operation(
             summary = "Return a rented car",
-            description = "Marks a rental as returned by setting the actual return date to the"
-                    + " current date. Also increases the inventory count of the returned car."
-                    + "(Required roles: CUSTOMER, MANAGER)"
+            description = """
+                Marks a rental as returned by:
+                - Setting the actual return date to the current date.
+                - Updating the rental status according to business rules:
+                  * If the rental was 'RESERVED' and cancelled early enough, status changes to
+                   'CANCELLED'.
+                  * Otherwise, status changes to 'WAITING_FOR_PAYMENT'.
+                - Increasing the inventory count of the returned car by one.
+        
+                Cancellation of 'RESERVED' rentals must happen at least 3 days before the rental
+                 start date.
+
+                **Required roles**: CUSTOMER, MANAGER
+            """
     )
     public RentalResponseDto returnRental(Authentication authentication,
                                           @PathVariable Long rentId) {

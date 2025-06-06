@@ -1,4 +1,4 @@
-package com.carshare.rentalsystem.client.telegram.command.handler.start.command;
+package com.carshare.rentalsystem.client.telegram.command.handler.common.command;
 
 import com.carshare.rentalsystem.client.telegram.ActiveTelegramUserStorage;
 import com.carshare.rentalsystem.client.telegram.TelegramAuthenticationService;
@@ -24,6 +24,7 @@ public class StartCommandHandler implements TelegramCommandHandler {
     private static final String START_COMMAND = "/start";
 
     private final TelegramAuthenticationService telegramAuthenticationService;
+    private final AesEncryptionUtil aesEncryptionUtil;
     private final TelegramUserLinkRepository telegramUserLinkRepository;
     private final TelegramLinkService telegramLinkService;
     private final UserMapper userMapper;
@@ -52,7 +53,7 @@ public class StartCommandHandler implements TelegramCommandHandler {
             return;
         }
 
-        String decryptedIdParameter = AesEncryptionUtil.decrypt(parameter);
+        String decryptedIdParameter = aesEncryptionUtil.decrypt(parameter);
         Long userId = Long.parseLong(decryptedIdParameter);
 
         if (telegramUserLinkRepository.existsByUserId(userId)) {
@@ -67,7 +68,7 @@ public class StartCommandHandler implements TelegramCommandHandler {
                 ? MessageRecipient.RECIPIENT_MANAGER : MessageRecipient.RECIPIENT_CUSTOMER;
 
         String responseMessage = messageTemplateDispatcher.createMessage(
-                MessageType.AUTH_LINK_MSG,
+                MessageType.COMMON_AUTH_LINK_MSG,
                 recipient,
                 userDto
         );

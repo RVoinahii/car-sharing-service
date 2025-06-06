@@ -1,9 +1,9 @@
-package com.carshare.rentalsystem.client.telegram.message.template.auth;
+package com.carshare.rentalsystem.client.telegram.message.template.common;
 
 import com.carshare.rentalsystem.client.telegram.message.template.MessageTemplateBuilder;
 import com.carshare.rentalsystem.dto.user.response.dto.UserResponseDto;
 
-public abstract class BaseAuthenticationMessageBuilder<T> implements MessageTemplateBuilder<T> {
+public abstract class BaseCommonMessageBuilder<T> implements MessageTemplateBuilder<T> {
     protected String formatUserInfo(UserResponseDto user) {
         return String.format("""
                                ID: %s

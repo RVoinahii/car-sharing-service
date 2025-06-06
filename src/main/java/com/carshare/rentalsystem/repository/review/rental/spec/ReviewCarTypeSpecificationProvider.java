@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.repository.review.rental.spec;
 
-import static com.carshare.rentalsystem.repository.review.rental.ReviewSpecificationBuilder.CAR_TYPE;
+import static com.carshare.rentalsystem.repository.review.rental.ReviewSpecificationBuilder.FIELD_CAR_TYPE;
 
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.RentalReview;
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 public class ReviewCarTypeSpecificationProvider implements SpecificationProvider<RentalReview> {
     @Override
     public String getKey() {
-        return CAR_TYPE;
+        return FIELD_CAR_TYPE;
     }
 
     @Override
     public Specification<RentalReview> getSpecification(String params) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(
-                        root.get(CAR_TYPE),
+                        root.get(FIELD_CAR_TYPE),
                         Car.Type.valueOf(params.toUpperCase())
                 );
     }

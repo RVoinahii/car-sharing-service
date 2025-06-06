@@ -51,8 +51,8 @@ public class GetAllPaymentsCommandHandler implements TelegramCommandHandler {
 
         if (telegramUserLink == null) {
             bot.execute(new SendMessage(chatId,
-                    "❗ Your Telegram account is not linked to any user in the system. "
-                            + "Please register or contact support."));
+                    "⚠️ Your Telegram account is not linked to any user in our system "
+                            + "Please register on our website."));
             return;
         }
 

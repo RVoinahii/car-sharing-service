@@ -1,6 +1,6 @@
 package com.carshare.rentalsystem.repository.rental.spec;
 
-import static com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder.RENTAL_STATUS;
+import static com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder.FIELD_RENTAL_STATUS;
 
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.repository.SpecificationProvider;
@@ -12,14 +12,14 @@ public class RentalStatusSpecificationProvider implements SpecificationProvider<
 
     @Override
     public String getKey() {
-        return RENTAL_STATUS;
+        return FIELD_RENTAL_STATUS;
     }
 
     @Override
     public Specification<Rental> getSpecification(String params) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(
-                        root.get(RENTAL_STATUS),
+                        root.get(FIELD_RENTAL_STATUS),
                         Rental.RentalStatus.valueOf(params.toUpperCase())
                 );
     }

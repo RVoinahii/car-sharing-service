@@ -42,15 +42,15 @@ public class GetPaymentCommandHandler implements TelegramCommandHandler {
 
         if (telegramUserLink == null) {
             bot.execute(new SendMessage(chatId,
-                    "❗ Your Telegram account is not linked to any user in the system. "
-                            + "Please register or contact support."));
+                    "⚠️ Your Telegram account is not linked to any user in our system "
+                            + "Please register on our website."));
             return;
         }
 
         String[] parts = text.trim().split(COMMAND_ARGUMENT_DELIMITER_REGEX);
         if (parts.length < MIN_COMMAND_PARTS) {
             bot.execute(new SendMessage(
-                    chatId, "❗ Please provide a payment ID. Example: /get_payment 123")
+                    chatId, "ℹ Please provide a payment ID to proceed. Example: /get_payment 123")
             );
             return;
         }
@@ -60,7 +60,8 @@ public class GetPaymentCommandHandler implements TelegramCommandHandler {
         try {
             paymentId = Long.parseLong(parts[DATA_ID_INDEX]);
         } catch (NumberFormatException e) {
-            bot.execute(new SendMessage(chatId, "❗️ Invalid payment ID. It must be a number."));
+            bot.execute(new SendMessage(chatId, "❗Invalid payment ID format. "
+                    + "The ID must be a number."));
             return;
         }
 
@@ -82,7 +83,8 @@ public class GetPaymentCommandHandler implements TelegramCommandHandler {
 
             bot.execute(new SendMessage(chatId, responseMessage));
         } catch (EntityNotFoundException e) {
-            bot.execute(new SendMessage(chatId, "❗️ Can't find payment with that id"));
+            bot.execute(new SendMessage(chatId, "❗️ No payment found with the provided ID."
+                    + " Please double-check and try again"));
         }
     }
 
