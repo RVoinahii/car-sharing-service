@@ -26,6 +26,8 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
           echo "AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}" >> $GITHUB_ENV
+          echo "AES_ENCRYPTION_KEY=${{ secrets.AES_ENCRYPTION_KEY }}" >> $GITHUB_ENV
+          echo "AES_ENCRYPTION_IV=${{ secrets.AES_ENCRYPTION_IV }}" >> $GITHUB_ENV
 
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots verify
