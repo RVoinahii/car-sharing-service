@@ -15,5 +15,4 @@ public record UserUpdateRequestDto(
         @Pattern(regexp = ".*\\S.*", message = "Last name must not be blank")
         String lastName
 ) {
-
 }
