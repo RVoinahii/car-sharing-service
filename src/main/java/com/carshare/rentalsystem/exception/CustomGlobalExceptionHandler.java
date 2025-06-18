@@ -114,6 +114,12 @@ public class CustomGlobalExceptionHandler {
         return buildErrorResponse(exception, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidPriceRangeFormatException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPriceRangeFormatExceptions(
+            InvalidPriceRangeFormatException exception) {
+        return buildErrorResponse(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MaxActiveRentalsExceededException.class)
     public ResponseEntity<Map<String, Object>> handleMaxActiveRentalsExceededExceptions(
             MaxActiveRentalsExceededException exception) {

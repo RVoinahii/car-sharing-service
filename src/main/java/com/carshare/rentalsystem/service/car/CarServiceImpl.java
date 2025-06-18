@@ -1,16 +1,21 @@
 package com.carshare.rentalsystem.service.car;
 
+import com.carshare.rentalsystem.dto.car.request.dto.CarSearchParameters;
 import com.carshare.rentalsystem.dto.car.request.dto.CreateCarRequestDto;
 import com.carshare.rentalsystem.dto.car.request.dto.InventoryUpdateRequestDto;
 import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
 import com.carshare.rentalsystem.dto.car.response.dto.CarResponseDto;
 import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.mapper.CarMapper;
+import com.carshare.rentalsystem.mapper.search.CarSearchParametersMapper;
 import com.carshare.rentalsystem.model.Car;
+import com.carshare.rentalsystem.repository.SpecificationBuilderFactory;
 import com.carshare.rentalsystem.repository.car.CarRepository;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +24,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final CarMapper carMapper;
+    private final CarSearchParametersMapper searchParametersMapper;
+    private final SpecificationBuilderFactory specificationBuilderFactory;
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CarPreviewResponseDto> getAll(Pageable pageable) {
-        return carRepository.findAll(pageable)
+    public Page<CarPreviewResponseDto> getAll(CarSearchParameters searchParameters,
+                                              Pageable pageable) {
+        Map<String, String> filters = searchParametersMapper.toMap(searchParameters);
+
+        Specification<Car> carSpecification = specificationBuilderFactory
+                .getBuilder(Car.class)
+                .build(filters);
+
+        return carRepository.findAll(carSpecification, pageable)
                 .map(carMapper::toPreviewDto);
     }
 

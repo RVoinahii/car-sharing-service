@@ -16,15 +16,17 @@ import com.carshare.rentalsystem.exception.RentalAccessDeniedException;
 import com.carshare.rentalsystem.exception.RentalAlreadyReturnedException;
 import com.carshare.rentalsystem.exception.TooLateToCancelRentalException;
 import com.carshare.rentalsystem.mapper.RentalMapper;
+import com.carshare.rentalsystem.mapper.search.RentalSearchParametersMapper;
 import com.carshare.rentalsystem.model.Car;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.User;
+import com.carshare.rentalsystem.repository.SpecificationBuilderFactory;
 import com.carshare.rentalsystem.repository.car.CarRepository;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
-import com.carshare.rentalsystem.repository.rental.RentalSpecificationBuilder;
 import com.carshare.rentalsystem.repository.user.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -48,7 +50,8 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
-    private final RentalSpecificationBuilder rentalSpecificationBuilder;
+    private final RentalSearchParametersMapper searchParametersMapper;
+    private final SpecificationBuilderFactory specificationBuilderFactory;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
@@ -96,8 +99,11 @@ public class RentalServiceImpl implements RentalService {
     @Override
     public Page<RentalPreviewResponseDto> getSpecificRentals(
             RentalSearchParameters searchParameters, Pageable pageable) {
-        Specification<Rental> rentalSpecification =
-                rentalSpecificationBuilder.build(searchParameters);
+        Map<String, String> filters = searchParametersMapper.toMap(searchParameters);
+
+        Specification<Rental> rentalSpecification = specificationBuilderFactory
+                .getBuilder(Rental.class)
+                .build(filters);
 
         return rentalRepository.findAll(rentalSpecification, pageable)
                 .map(rentalMapper::toPreviewDto);
