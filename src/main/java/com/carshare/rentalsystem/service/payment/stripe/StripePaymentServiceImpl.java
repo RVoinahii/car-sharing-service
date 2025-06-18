@@ -12,17 +12,19 @@ import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.exception.PaymentNotExpiredException;
 import com.carshare.rentalsystem.exception.RentalNotFinishedException;
 import com.carshare.rentalsystem.mapper.PaymentMapper;
+import com.carshare.rentalsystem.mapper.search.PaymentSearchParametersMapper;
 import com.carshare.rentalsystem.model.Payment;
 import com.carshare.rentalsystem.model.Payment.PaymentType;
 import com.carshare.rentalsystem.model.PaymentSession;
 import com.carshare.rentalsystem.model.Rental;
+import com.carshare.rentalsystem.repository.SpecificationBuilderFactory;
 import com.carshare.rentalsystem.repository.payment.PaymentRepository;
-import com.carshare.rentalsystem.repository.payment.PaymentSpecificationBuilder;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
 import com.carshare.rentalsystem.service.payment.PaymentProvider;
 import com.carshare.rentalsystem.service.payment.RentalPaymentCalculator;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -44,7 +46,8 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentProvider paymentProvider;
     private final PaymentMapper paymentMapper;
-    private final PaymentSpecificationBuilder paymentSpecificationBuilder;
+    private final PaymentSearchParametersMapper searchParametersMapper;
+    private final SpecificationBuilderFactory specificationBuilderFactory;
     private final RentalPaymentCalculator rentalPaymentCalculator;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -59,8 +62,10 @@ public class StripePaymentServiceImpl implements StripePaymentService {
     @Override
     public Page<PaymentPreviewResponseDto> getSpecificPayments(
             PaymentSearchParameters searchParameters, Pageable pageable) {
-        Specification<Payment> paymentSpecification =
-                paymentSpecificationBuilder.build(searchParameters);
+        Map<String, String> filters = searchParametersMapper.toMap(searchParameters);
+
+        Specification<Payment> paymentSpecification = specificationBuilderFactory
+                .getBuilder(Payment.class).build(filters);
 
         return paymentRepository.findAll(paymentSpecification, pageable)
                 .map(paymentMapper::toPreviewDto);

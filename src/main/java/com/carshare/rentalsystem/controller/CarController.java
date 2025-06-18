@@ -1,5 +1,6 @@
 package com.carshare.rentalsystem.controller;
 
+import com.carshare.rentalsystem.dto.car.request.dto.CarSearchParameters;
 import com.carshare.rentalsystem.dto.car.request.dto.CreateCarRequestDto;
 import com.carshare.rentalsystem.dto.car.request.dto.InventoryUpdateRequestDto;
 import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(
@@ -57,10 +60,10 @@ public class CarController {
         **No authentication required.**
             """
     )
-    public Page<CarPreviewResponseDto> getAllCars(
+    public Page<CarPreviewResponseDto> getAllCars(CarSearchParameters searchParameters,
             @ParameterObject @PageableDefault(sort = {MODEL, BRAND},
                     direction = Sort.Direction.ASC) Pageable pageable) {
-        return carService.getAll(pageable);
+        return carService.getAll(searchParameters, pageable);
     }
 
     @GetMapping("/{carId}")
@@ -78,6 +81,7 @@ public class CarController {
     }
 
     @PreAuthorize("hasAuthority('MANAGER')")
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @Operation(
             summary = "Create a new car entry",
@@ -130,6 +134,7 @@ public class CarController {
     }
 
     @PreAuthorize("hasAuthority('MANAGER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{carId}")
     @Operation(
             summary = "Delete a car by ID",

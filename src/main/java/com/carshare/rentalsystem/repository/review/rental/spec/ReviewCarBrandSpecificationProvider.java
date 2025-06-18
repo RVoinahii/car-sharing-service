@@ -1,8 +1,9 @@
 package com.carshare.rentalsystem.repository.review.rental.spec;
 
+import static com.carshare.rentalsystem.repository.car.spec.CarBrandSpecificationProvider.FIELD_CAR_BRAND;
 import static com.carshare.rentalsystem.repository.payment.spec.PaymentUserIdSpecificationProvider.FIELD_RENTAL;
-import static com.carshare.rentalsystem.repository.review.rental.ReviewSpecificationBuilder.FIELD_CAR_BRAND;
 
+import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.RentalReview;
 import com.carshare.rentalsystem.repository.SpecificationProvider;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,5 +24,10 @@ public class ReviewCarBrandSpecificationProvider implements SpecificationProvide
                 criteriaBuilder.like(
                         criteriaBuilder.lower(root.get(FIELD_RENTAL).get(FIELD_CAR)
                                 .get(FIELD_CAR_BRAND)), "%" + params.toLowerCase() + "%");
+    }
+
+    @Override
+    public Class<?> getTargetType() {
+        return Rental.class;
     }
 }

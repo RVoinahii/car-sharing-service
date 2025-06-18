@@ -8,16 +8,18 @@ import com.carshare.rentalsystem.exception.EntityNotFoundException;
 import com.carshare.rentalsystem.exception.RentalNotFinishedException;
 import com.carshare.rentalsystem.exception.ReviewAccessDeniedException;
 import com.carshare.rentalsystem.mapper.RentalReviewMapper;
+import com.carshare.rentalsystem.mapper.search.ReviewSearchParametersMapper;
 import com.carshare.rentalsystem.model.Rental;
 import com.carshare.rentalsystem.model.RentalReview;
 import com.carshare.rentalsystem.model.RentalReviewMedia;
+import com.carshare.rentalsystem.repository.SpecificationBuilderFactory;
 import com.carshare.rentalsystem.repository.rental.RentalRepository;
 import com.carshare.rentalsystem.repository.review.rental.RentalReviewRepository;
-import com.carshare.rentalsystem.repository.review.rental.ReviewSpecificationBuilder;
 import com.carshare.rentalsystem.service.aws.s3.S3StorageService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +35,8 @@ public class RentalReviewServiceImpl implements RentalReviewService {
     private final RentalRepository rentalRepository;
     private final RentalReviewRepository rentalReviewRepository;
     private final RentalReviewMapper rentalReviewMapper;
-    private final ReviewSpecificationBuilder reviewSpecificationBuilder;
+    private final ReviewSearchParametersMapper searchParametersMapper;
+    private final SpecificationBuilderFactory specificationBuilderFactory;
 
     @Transactional
     @Override
@@ -81,10 +84,12 @@ public class RentalReviewServiceImpl implements RentalReviewService {
     @Override
     public Page<ReviewPreviewResponseDto> getSpecificReviews(
             ReviewSearchParameters searchParameters, Pageable pageable) {
-        Specification<RentalReview> rentalSpecification =
-                reviewSpecificationBuilder.build(searchParameters);
+        Map<String, String> filters = searchParametersMapper.toMap(searchParameters);
 
-        return rentalReviewRepository.findAll(rentalSpecification, pageable)
+        Specification<RentalReview> reviewSpecification = specificationBuilderFactory
+                .getBuilder(RentalReview.class).build(filters);
+
+        return rentalReviewRepository.findAll(reviewSpecification, pageable)
                 .map(rentalReviewMapper::toPreviewDto);
     }
 

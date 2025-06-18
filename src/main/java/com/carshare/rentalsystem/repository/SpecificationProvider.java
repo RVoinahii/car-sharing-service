@@ -6,4 +6,6 @@ public interface SpecificationProvider<T> {
     String getKey();
 
     Specification<T> getSpecification(String params);
+
+    Class<?> getTargetType();
 }
