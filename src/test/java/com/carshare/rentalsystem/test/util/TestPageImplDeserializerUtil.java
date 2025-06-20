@@ -11,7 +11,7 @@ import java.util.List;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-public class PageImplDeserializerUtil<T> extends StdDeserializer<PageImpl<T>> {
+public class TestPageImplDeserializerUtil<T> extends StdDeserializer<PageImpl<T>> {
     private static final String CONTENT_FIELD = "content";
     private static final String NUMBER_FIELD = "number";
     private static final String SIZE_FIELD = "size";
@@ -20,7 +20,7 @@ public class PageImplDeserializerUtil<T> extends StdDeserializer<PageImpl<T>> {
     private final Class<T> clazz;
     private final int defaultSize;
 
-    public PageImplDeserializerUtil(Class<T> clazz, int defaultSize) {
+    public TestPageImplDeserializerUtil(Class<T> clazz, int defaultSize) {
         super(PageImpl.class);
         this.clazz = clazz;
         this.defaultSize = defaultSize;

@@ -1,5 +1,6 @@
 package com.carshare.rentalsystem.repository.rental.spec;
 
+import static com.carshare.rentalsystem.repository.payment.spec.PaymentUserIdSpecificationProvider.FIELD_ID;
 import static com.carshare.rentalsystem.repository.payment.spec.PaymentUserIdSpecificationProvider.FIELD_USER;
 import static com.carshare.rentalsystem.repository.payment.spec.PaymentUserIdSpecificationProvider.FIELD_USER_ID;
 
@@ -19,7 +20,7 @@ public class RentalUserIdSpecificationProvider implements SpecificationProvider<
     @Override
     public Specification<Rental> getSpecification(String params) {
         return (root, query, criteriaBuilder) -> {
-            Path<Long> userIdPath = root.get(FIELD_USER).get("id");
+            Path<Long> userIdPath = root.get(FIELD_USER).get(FIELD_ID);
             return criteriaBuilder.equal(userIdPath, Long.valueOf(params));
         };
     }
