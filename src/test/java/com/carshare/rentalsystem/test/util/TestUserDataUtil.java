@@ -9,6 +9,7 @@ import com.carshare.rentalsystem.model.User;
 
 public class TestUserDataUtil {
     public static final String USER_EMAIL = "mail.example@gmail.com";
+    public static final String USER_WITHOUT_RENTALS_EMAIL = "withoutrentals.example@gmail.com";
     public static final String USER_PASSWORD = "password";
     public static final String USER_HASHED_PASSWORD =
             "$2a$10$40VcEX9yypgQXTJ0CL/oteEJuB03CJ0lGzxmhB1ZlsDDLL5LnHbga";

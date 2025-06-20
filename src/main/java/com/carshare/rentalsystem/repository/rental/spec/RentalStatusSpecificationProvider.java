@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RentalStatusSpecificationProvider implements SpecificationProvider<Rental> {
-
     @Override
     public String getKey() {
         return FIELD_STATUS;

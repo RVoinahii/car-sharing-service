@@ -25,7 +25,7 @@ import com.carshare.rentalsystem.dto.car.request.dto.InventoryUpdateRequestDto;
 import com.carshare.rentalsystem.dto.car.response.dto.CarPreviewResponseDto;
 import com.carshare.rentalsystem.dto.car.response.dto.CarResponseDto;
 import com.carshare.rentalsystem.service.car.CarService;
-import com.carshare.rentalsystem.test.util.PageImplDeserializerUtil;
+import com.carshare.rentalsystem.test.util.TestPageImplDeserializerUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -80,7 +80,7 @@ public class CarControllerTests {
         //Given
         ObjectMapper localMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(PageImpl.class, new PageImplDeserializerUtil<>(
+        module.addDeserializer(PageImpl.class, new TestPageImplDeserializerUtil<>(
                 CarPreviewResponseDto.class, PAGE_SIZE));
         localMapper.registerModule(module);
 
@@ -132,7 +132,7 @@ public class CarControllerTests {
 
         ObjectMapper localMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(PageImpl.class, new PageImplDeserializerUtil<>(
+        module.addDeserializer(PageImpl.class, new TestPageImplDeserializerUtil<>(
                 CarPreviewResponseDto.class, PAGE_SIZE));
         localMapper.registerModule(module);
 
